@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baulko Bell Times</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Add favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path d=%22M50 15c-15 0-25 10-25 25v25l-10 10h70l-10-10V40c0-15-10-25-25-25z%22 fill=%22%236200ea%22/><path d=%22M50 85c5.5 0 10-4.5 10-10H40c0 5.5 4.5 10 10 10z%22 fill=%22%236200ea%22/><path d=%22M50 15c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z%22 fill=%22%236200ea%22/></svg>">
+    <!-- Add theme color for mobile browsers -->
+    <meta name="theme-color" content="#6200ea">
+</head>
+<body>
+    <div class="container">
+        <h2><span id="greeting-text">Good evening</span><span id="user-name" class="clickable-name"></span></h2>
+        <div class="schedule">
+            <div class="schedule-content">
+                <div class="header">
+                    <h3><span id="schedule-status"></span><span id="selected-day"></span></h3>
+                    <div class="controls">
+                        <select id="day-selector">
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                        </select>
+                        <button class="settings-btn global" onclick="toggleSettingsModal()" aria-label="Settings">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.325 2.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="countdown">Next period in: --:--</div>
+                <div id="schedule-list"></div>
+                <div id="notepad" class="notepad" style="display: none;">
+                    <div class="notepad-header">
+                        <h3>Notes</h3>
+                        <div class="formatting-tools">
+                            <button onclick="formatText('bold')" title="Bold" class="format-btn">B</button>
+                            <button onclick="formatText('italic')" title="Italic" class="format-btn">I</button>
+                            <button onclick="formatText('underline')" title="Underline" class="format-btn">U</button>
+                            <select onchange="formatText('size', this.value)" title="Text Size">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Normal</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="notes-content" class="notes-content" contenteditable="true" placeholder="Type your notes here..."></div>
+                </div>
+            </div>
+            <div class="schedule-gap"></div>
+            <div class="sidebar">
+                <div id="quick-links" class="quick-links" style="display: none">
+                    <h3 class="quick-links-title">Quick Links</h3>
+                    <div class="quick-links-list"></div>
+                </div>
+                <div id="pomodoro" class="pomodoro" style="display: none">
+                    <h3 class="pomodoro-title">Study Timer</h3>
+                    <div class="timer-display">25:00</div>
+                    <div class="timer-controls">
+                        <button class="timer-btn" onclick="setTimerMode('pomodoro')" id="pomodoro-btn">Focus</button>
+                        <button class="timer-btn" onclick="setTimerMode('break')" id="break-btn">Break</button>
+                        <button class="timer-btn" id="timer-toggle" onclick="toggleTimer()">Start</button>
+                        <button class="timer-btn stop-btn" id="timer-stop" onclick="stopTimer()">Stop</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="timetable-upload">
+            <h3>Import Timetable 
+                <svg class="help-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm2-1.645A3.502 3.502 0 0012 6.5a3.501 3.501 0 00-3.433 2.813l1.962.393A1.5 1.5 0 1112 11.5a1 1 0 00-1 1V14h2v-.645z" fill="currentColor"/>
+                </svg>
+                <div class="help-tooltip">
+                    <h4>How to Upload Your Timetable:</h4>
+                    <ol>
+                        <li>Navigate to the "My Timetable" section in your Sentral dashboard</li>
+                        <li>Look for the "Export as iCal" button in the top-right corner and click it to download your timetable</li>
+                        <li>Use the "Import Timetable" button below to upload the downloaded file</li>
+                        <li>Your personalized class schedule will now appear in the bell times display!</li>
+                    </ol>
+                </div>
+            </h3>
+            <div class="upload-container">
+                <input type="file" id="timetableupload" accept=".ics" />
+                <button onclick="document.getElementById('timetableupload').click()" class="upload-btn">Choose ICS File</button>
+                <button onclick="clearTimetableStorage()" class="clear-btn">Clear Timetable</button>
+            </div>
+            <p id="uploadstatus">Status: Ready to accept timetable upload...</p>
+        </div>
+    </div>
+    <footer>
+        <div class="footer-content">
+            <a href="mailto:aryashaarav@icloud.com">Made with love by Shaarav4795</a>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <h3>Settings</h3>
+            <div class="settings-tabs">
+                <button class="tab-btn active" onclick="switchTab('timetable')">Timetable</button>
+                <button class="tab-btn" onclick="switchTab('themes')">Themes</button>
+                <button class="tab-btn" onclick="switchTab('tiles')">Tiles</button>
+                <button class="tab-btn" onclick="switchTab('more')">More</button>
+            </div>
+            
+            <div id="timetable-tab" class="tab-content active">
+                <div class="modal-buttons">
+                    <input type="file" id="timetableupload" accept=".ics" />
+                    <button onclick="document.getElementById('timetableupload').click()" class="upload-btn">Import Timetable</button>
+                    <button onclick="clearTimetableStorage()" class="clear-btn">Clear Timetable</button>
+                </div>
+            </div>
+
+            <div id="themes-tab" class="tab-content">
+                <div class="theme-presets">
+                    <h4>Static Themes</h4>
+                    <div class="theme-grid">
+                        <button onclick="setTheme('default')" class="theme-btn default-theme">
+                            <span class="theme-preview"></span>
+                            Default
+                        </button>
+                        <button onclick="setTheme('dark')" class="theme-btn dark-theme">
+                            <span class="theme-preview"></span>
+                            Dark
+                        </button>
+                        <button onclick="setTheme('light')" class="theme-btn light-theme">
+                            <span class="theme-preview"></span>
+                            Light
+                        </button>
+                        <button onclick="setTheme('purple')" class="theme-btn purple-theme">
+                            <span class="theme-preview"></span>
+                            Purple
+                        </button>
+                        <button onclick="setTheme('green')" class="theme-btn green-theme">
+                            <span class="theme-preview"></span>
+                            Green
+                        </button>
+                        <button onclick="setTheme('ocean')" class="theme-btn ocean-theme">
+                            <span class="theme-preview"></span>
+                            Ocean
+                        </button>
+                        <button onclick="setTheme('sunset')" class="theme-btn sunset-theme">
+                            <span class="theme-preview"></span>
+                            Sunset
+                        </button>
+                        <button onclick="setTheme('minimal')" class="theme-btn minimal-theme">
+                            <span class="theme-preview"></span>
+                            Minimal
+                        </button>
+                        <button onclick="setTheme('retro')" class="theme-btn retro-theme">
+                            <span class="theme-preview"></span>
+                            Retro
+                        </button>
+                        <button onclick="setTheme('forest')" class="theme-btn forest-theme">
+                            <span class="theme-preview"></span>
+                            Forest
+                        </button>
+                        <button onclick="setTheme('candy')" class="theme-btn candy-theme">
+                            <span class="theme-preview"></span>
+                            Candy
+                        </button>
+                        <button onclick="setTheme('coffee')" class="theme-btn coffee-theme">
+                            <span class="theme-preview"></span>
+                            Coffee
+                        </button>
+                        <button onclick="setTheme('mint')" class="theme-btn mint-theme">
+                            <span class="theme-preview"></span>
+                            Mint
+                        </button>
+                        <button onclick="setTheme('coral')" class="theme-btn coral-theme">
+                            <span class="theme-preview"></span>
+                            Coral
+                        </button>
+                        <button onclick="setTheme('lavender')" class="theme-btn lavender-theme">
+                            <span class="theme-preview"></span>
+                            Lavender
+                        </button>
+                    </div>
+                    <h4>Dynamic Themes</h4>
+                    <div class="theme-grid">
+                        <button onclick="setTheme('dynamic-time')" class="theme-btn dynamic-time-theme">
+                            <span class="theme-preview"></span>
+                            Time Based
+                        </button>
+                        <button onclick="setTheme('dynamic-season')" class="theme-btn dynamic-season-theme">
+                            <span class="theme-preview"></span>
+                            Seasonal
+                        </button>
+                        <button onclick="setTheme('dynamic-study')" class="theme-btn dynamic-study-theme">
+                            <span class="theme-preview"></span>
+                            Study Focus
+                        </button>
+                        <button onclick="setTheme('dynamic-energy')" class="theme-btn dynamic-energy-theme">
+                            <span class="theme-preview"></span>
+                            Energy
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tiles-tab" class="tab-content">
+                <div class="tiles-options">
+                    <div class="tile-toggle">
+                        <label>
+                            <input type="checkbox" id="notepad-toggle" onchange="toggleNotepad()">
+                            Notepad
+                        </label>
+                        <button onclick="clearNotes()" class="clear-notes-btn">Clear Notes</button>
+                    </div>
+                    <div class="tile-toggle">
+                        <label>
+                            <input type="checkbox" id="quick-links-toggle" onchange="toggleQuickLinks()">
+                            Quick Links
+                        </label>
+                        <button onclick="editQuickLinks()" class="settings-btn">Edit Links</button>
+                    </div>
+                    <div class="tile-toggle">
+                        <label>
+                            <input type="checkbox" id="pomodoro-toggle" onchange="togglePomodoro()">
+                            Study Timer
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="more-tab" class="tab-content">
+                <div class="name-settings">
+                    <h4>Your Name</h4>
+                    <div class="name-edit">
+                        <input type="text" id="name-input" placeholder="Enter your name">
+                        <button onclick="updateName()" class="settings-btn">Update Name</button>
+                    </div>
+                </div>
+                <div class="countdown-settings">
+                    <h4>Countdown Display</h4>
+                    <div class="countdown-options">
+                        <label>
+                            <input type="checkbox" id="show-room" checked onchange="updateCountdownPreferences()">
+                            Show Room Number
+                        </label>
+                        <label>
+                            <input type="checkbox" id="show-subject" checked onchange="updateCountdownPreferences()">
+                            Show Subject Name
+                        </label>
+                    </div>
+                </div>
+                <div class="reset-settings">
+                    <h4>Reset Settings</h4>
+                    <p>Reset all settings to their default values. This will clear your name, preferences, quick links, notes, and theme.</p>
+                    <button onclick="resetAllSettings()" class="reset-btn">Reset All Settings</button>
+                </div>
+                <div class="extension-info">
+                    <h4>Chrome Extension</h4>
+                    <p>Get the Baulko Bell Times Chrome extension for quick access from your browser!</p>
+                    
+                    <div class="extension-steps">
+                        <h5>Installation Instructions:</h5>
+                        <ol>
+                            <li>Open <a href="https://drive.google.com/drive/folders/1aljeqUz_4ZmBM-dFm2YXBnHlQTfAyUDG" target="_blank" class="extension-link">this Google Drive link</a></li>
+                            <li>Select All</li>
+                            <li>Press the 'Download' button</li>
+                            <li>Extract the downloaded ZIP file</li>
+                            <li>Open <code>chrome://extensions</code> in your browser</li>
+                            <li>Enable "Developer mode" using the toggle in the top-right</li>
+                            <li>Click "Load unpacked" and select the extracted folder (not individual files)</li>
+                            <li>Enjoy your new extension!</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="extension-note">
+                        <p><strong>Note:</strong> The extension provides quick access to bell times directly from your Chrome toolbar.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="close-btn" onclick="toggleSettingsModal()">×</button>
+        </div>
+    </div>
+
+    <!-- Add Welcome Modal -->
+    <div id="welcome-modal" class="modal welcome-modal">
+        <div class="modal-content welcome-content">
+            <h3>Welcome to Baulko Bell Times! 👋</h3>
+            <p>This app helps you keep track of your school schedule and upcoming periods.</p>
+            
+            <div class="welcome-name-section">
+                <h4>What's your name?</h4>
+                <p class="welcome-subtitle">We'll use this to personalize your experience (optional)</p>
+                <input type="text" id="welcome-name-input" placeholder="Enter your name" maxlength="30" style="text-align: center;">
+                <div class="welcome-buttons">
+                    <button onclick="skipName()" class="welcome-skip-btn">Skip</button>
+                    <button onclick="setInitialName()" class="welcome-continue-btn">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
