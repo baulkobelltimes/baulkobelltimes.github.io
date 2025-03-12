@@ -1722,6 +1722,7 @@ window.onload = function() {
     initializeTheme();
     loadNotes();
     loadQuickLinks();
+    loadQuote();
     addPeriodStyles();
     schedulePageRefreshes();  // Add this line
     // ... existing code ...
@@ -1982,4 +1983,233 @@ document.addEventListener('DOMContentLoaded', function() {
             makeTimerEditable();
         }
     });
+});
+
+function toggleQuote() {
+    const quoteToggle = document.getElementById('quote-toggle');
+    const quote = document.getElementById('quote-of-day');
+    const schedule = document.querySelector('.schedule');
+    
+    localStorage.setItem('quoteEnabled', quoteToggle.checked);
+    quote.style.display = quoteToggle.checked ? 'block' : 'none';
+    
+    // Update the sidebar visibility based on all toggles
+    const quickLinksEnabled = localStorage.getItem('quickLinksEnabled') === 'true';
+    const pomodoroEnabled = localStorage.getItem('pomodoroEnabled') === 'true';
+    
+    if (quoteToggle.checked || quickLinksEnabled || pomodoroEnabled) {
+        schedule.classList.add('with-quick-links');
+    } else {
+        schedule.classList.remove('with-quick-links');
+    }
+
+    if (quoteToggle.checked) {
+        fetchQuote();
+    }
+}
+
+async function fetchQuote() {
+    const quoteText = document.getElementById('quote-text');
+    const quoteAuthor = document.getElementById('quote-author');
+    const quoteContent = document.querySelector('.quote-content');
+    const refreshButton = document.querySelector('.refresh-quote');
+    
+    if (!quoteText || !quoteAuthor || !quoteContent) return;
+    
+    try {
+        // Disable refresh button and add loading state
+        if (refreshButton) {
+            refreshButton.disabled = true;
+            refreshButton.style.opacity = '0.5';
+        }
+        quoteContent.classList.add('loading');
+        
+        // Get a random quote from our local collection
+        const quote = getRandomQuote();
+        
+        // Animate the new quote
+        quoteContent.style.opacity = '0';
+        setTimeout(() => {
+            quoteText.textContent = quote.text;
+            quoteAuthor.textContent = quote.author;
+            quoteContent.style.opacity = '1';
+        }, 200);
+        
+        // Save the quote to localStorage
+        localStorage.setItem('lastQuote', JSON.stringify({
+            text: quote.text,
+            author: quote.author,
+            date: new Date().toDateString()
+        }));
+    } catch (error) {
+        console.error('Error displaying quote:', error);
+        // Only show fallback if there's no existing quote
+        if (!quoteText.textContent) {
+            quoteText.textContent = 'Knowledge is power.';
+            quoteAuthor.textContent = 'Francis Bacon';
+        }
+    } finally {
+        // Re-enable refresh button and remove loading state
+        if (refreshButton) {
+            refreshButton.disabled = false;
+            refreshButton.style.opacity = '1';
+        }
+        quoteContent.classList.remove('loading');
+    }
+}
+
+function loadQuote() {
+    const quoteEnabled = localStorage.getItem('quoteEnabled') === 'true';
+    const quoteToggle = document.getElementById('quote-toggle');
+    const quote = document.getElementById('quote-of-day');
+    
+    if (!quoteToggle || !quote) return;
+    
+    // Set the toggle state
+    quoteToggle.checked = quoteEnabled;
+    quote.style.display = quoteEnabled ? 'block' : 'none';
+    
+    if (quoteEnabled) {
+        // Check if we already have a quote for today
+        const lastQuote = JSON.parse(localStorage.getItem('lastQuote'));
+        const now = new Date().toDateString();
+        
+        if (lastQuote && lastQuote.date === now) {
+            const quoteText = document.getElementById('quote-text');
+            const quoteAuthor = document.getElementById('quote-author');
+            if (quoteText && quoteAuthor) {
+                quoteText.textContent = lastQuote.text;
+                quoteAuthor.textContent = lastQuote.author;
+            }
+        } else {
+            fetchQuote();
+        }
+    }
+}
+
+// Add CSS transition for quote content
+document.addEventListener('DOMContentLoaded', function() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .quote-content {
+            transition: opacity 0.2s ease-in-out;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Initialize quote functionality
+    loadQuote();
+});
+
+// Add drag and drop functionality
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.querySelector('.sidebar');
+    let draggingElem = null;
+    let placeholder = null;
+    let isDragging = false;
+    let startY;
+    let startScrollY;
+
+    // Save tile order to localStorage
+    function saveTileOrder() {
+        const sidebar = document.querySelector('.sidebar');
+        const tiles = Array.from(sidebar.children).map(tile => {
+            // Get the data-tile-type attribute or fallback to element id
+            return tile.dataset.tileType || tile.id;
+        });
+        localStorage.setItem('tileOrder', JSON.stringify(tiles));
+    }
+
+    // Load tile order from localStorage
+    function loadTileOrder() {
+        const savedOrder = localStorage.getItem('tileOrder');
+        if (!savedOrder) return;
+
+        const sidebar = document.querySelector('.sidebar');
+        const tiles = JSON.parse(savedOrder);
+        
+        // Reorder the tiles based on saved order
+        tiles.forEach(tileId => {
+            const tile = sidebar.querySelector(`[data-tile-type="${tileId}"], #${tileId}`);
+            if (tile) {
+                sidebar.appendChild(tile);
+            }
+        });
+    }
+
+    // Add drag indicators to tiles
+    function initializeDragHandles() {
+        const sidebar = document.querySelector('.sidebar');
+        const tiles = sidebar.children;
+
+        Array.from(tiles).forEach(tile => {
+            // Create drag handle if it doesn't exist
+            if (!tile.querySelector('.drag-indicator')) {
+                const dragHandle = document.createElement('div');
+                dragHandle.className = 'drag-indicator';
+                dragHandle.innerHTML = '⋮⋮';
+                tile.insertBefore(dragHandle, tile.firstChild);
+            }
+        });
+
+        // Add drag and drop event listeners
+        sidebar.addEventListener('dragstart', handleEditorDragStart);
+        sidebar.addEventListener('dragend', handleEditorDragEnd);
+        sidebar.addEventListener('dragover', handleEditorDragOver);
+        sidebar.addEventListener('drop', handleEditorDrop);
+
+        // Make tiles draggable
+        Array.from(tiles).forEach(tile => {
+            tile.draggable = true;
+        });
+    }
+
+    sidebar.addEventListener('dragstart', (e) => {
+        draggingElem = e.target;
+        draggingElem.classList.add('dragging');
+        
+        placeholder = document.createElement('div');
+        placeholder.className = 'drag-placeholder';
+        draggingElem.parentNode.insertBefore(placeholder, draggingElem.nextSibling);
+        
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', '');
+    });
+
+    sidebar.addEventListener('dragend', () => {
+        draggingElem.classList.remove('dragging');
+        placeholder.parentNode.insertBefore(draggingElem, placeholder);
+        placeholder.remove();
+        saveTileOrder();
+    });
+
+    sidebar.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(sidebar, e.clientY);
+        
+        if (afterElement) {
+            sidebar.insertBefore(placeholder, afterElement);
+        } else {
+            sidebar.appendChild(placeholder);
+        }
+    });
+
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('div:not(.dragging):not(.drag-placeholder)')];
+        
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Initialize drag handles and load saved order
+    initializeDragHandles();
+    loadTileOrder();
 });

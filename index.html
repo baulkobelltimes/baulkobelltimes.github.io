@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baulko Bell Times</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Add Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Add favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path d=%22M50 15c-15 0-25 10-25 25v25l-10 10h70l-10-10V40c0-15-10-25-25-25z%22 fill=%22%236200ea%22/><path d=%22M50 85c5.5 0 10-4.5 10-10H40c0 5.5 4.5 10 10 10z%22 fill=%22%236200ea%22/><path d=%22M50 15c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z%22 fill=%22%236200ea%22/></svg>">
     <!-- Add theme color for mobile browsers -->
@@ -26,10 +28,7 @@
                             <option value="Friday">Friday</option>
                         </select>
                         <button class="settings-btn global" onclick="toggleSettingsModal()" aria-label="Settings">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8.325 2.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                            <span class="material-icons">settings</span>
                         </button>
                     </div>
                 </div>
@@ -58,6 +57,16 @@
                     <h3 class="quick-links-title">Quick Links</h3>
                     <div class="quick-links-list"></div>
                 </div>
+                <div id="quote-of-day" class="quote-of-day" style="display: none">
+                    <h3 class="quote-title">Quote of the Day</h3>
+                    <div class="quote-content">
+                        <p id="quote-text"></p>
+                        <p id="quote-author"></p>
+                    </div>
+                    <button class="refresh-quote" onclick="fetchQuote()" title="Get new quote">
+                        <span class="material-icons">refresh</span>
+                    </button>
+                </div>
                 <div id="pomodoro" class="pomodoro" style="display: none">
                     <h3 class="pomodoro-title">Study Timer</h3>
                     <div class="timer-display">25:00</div>
@@ -68,14 +77,21 @@
                         <button class="timer-btn stop-btn" id="timer-stop" onclick="stopTimer()">Stop</button>
                     </div>
                 </div>
+                <div class="bell-times-card" data-tile-type="bell-times">
+                    <!-- Bell times content -->
+                </div>
+                <div class="quote-card" data-tile-type="quote">
+                    <!-- Quote content -->
+                </div>
+                <div class="weather-card" data-tile-type="weather">
+                    <!-- Weather content -->
+                </div>
             </div>
         </div>
 
         <div class="timetable-upload">
             <h3>Import Timetable 
-                <svg class="help-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm2-1.645A3.502 3.502 0 0012 6.5a3.501 3.501 0 00-3.433 2.813l1.962.393A1.5 1.5 0 1112 11.5a1 1 0 00-1 1V14h2v-.645z" fill="currentColor"/>
-                </svg>
+                <span class="material-icons help-icon">help</span>
                 <div class="help-tooltip">
                     <h4>How to Upload Your Timetable:</h4>
                     <ol>
@@ -100,6 +116,7 @@
         </div>
     </footer>
     <script src="script.js"></script>
+    <script src="quotes.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
 
     <!-- Settings Modal -->
@@ -228,6 +245,12 @@
                         <label>
                             <input type="checkbox" id="pomodoro-toggle" onchange="togglePomodoro()">
                             Study Timer
+                        </label>
+                    </div>
+                    <div class="tile-toggle">
+                        <label>
+                            <input type="checkbox" id="quote-toggle" onchange="toggleQuote()">
+                            Quote of the Day
                         </label>
                     </div>
                 </div>
