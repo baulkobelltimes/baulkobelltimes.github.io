@@ -1060,6 +1060,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeTheme();
     loadNotes();
     loadQuickLinks();
+    initializeGames();
     
     // Set initial state for pomodoro toggle
     const pomodoroToggle = document.getElementById('pomodoro-toggle');
@@ -1265,10 +1266,11 @@ function toggleQuickLinks() {
     localStorage.setItem('quickLinksEnabled', quickLinksToggle.checked);
     quickLinks.style.display = quickLinksToggle.checked ? 'block' : 'none';
     
-    // Update the sidebar visibility based on both toggles
+    // Update the sidebar visibility based on any enabled feature
     const pomodoroEnabled = localStorage.getItem('pomodoroEnabled') === 'true';
+    const quoteEnabled = localStorage.getItem('quoteEnabled') === 'true';
     
-    if (quickLinksToggle.checked || pomodoroEnabled) {
+    if (quickLinksToggle.checked || pomodoroEnabled || quoteEnabled) {
         schedule.classList.add('with-quick-links');
     } else {
         schedule.classList.remove('with-quick-links');
@@ -1278,29 +1280,30 @@ function toggleQuickLinks() {
 function loadQuickLinks() {
     const quickLinksEnabled = localStorage.getItem('quickLinksEnabled') === 'true';
     const pomodoroEnabled = localStorage.getItem('pomodoroEnabled') === 'true';
+    const quoteEnabled = localStorage.getItem('quoteEnabled') === 'true';
     const quickLinksToggle = document.getElementById('quick-links-toggle');
     const pomodoroToggle = document.getElementById('pomodoro-toggle');
+    const quoteToggle = document.getElementById('quote-toggle');
     const quickLinks = document.getElementById('quick-links');
     const pomodoro = document.getElementById('pomodoro');
-    const schedule = document.querySelector('.schedule');
+    const quote = document.getElementById('quote-of-day');
     const quickLinksList = document.querySelector('.quick-links-list');
     
     // Set the toggle states
     quickLinksToggle.checked = quickLinksEnabled;
     pomodoroToggle.checked = pomodoroEnabled;
+    quoteToggle.checked = quoteEnabled;
     
     // Update displays
     quickLinks.style.display = quickLinksEnabled ? 'block' : 'none';
     pomodoro.style.display = pomodoroEnabled ? 'block' : 'none';
+    quote.style.display = quoteEnabled ? 'block' : 'none';
     
-    if (quickLinksEnabled || pomodoroEnabled) {
-        schedule.classList.add('with-quick-links');
-    } else {
-        schedule.classList.remove('with-quick-links');
-    }
+    // Update sidebar visibility
+    updateSidebarVisibility();
     
     // Load saved links or use defaults
-    const savedLinks = JSON.parse(localStorage.getItem('quickLinks')) || DEFAULT_QUICK_LINKS;
+    const savedLinks = JSON.parse(localStorage.getItem('quickLinks')) || defaultQuickLinks;
     quickLinksList.innerHTML = savedLinks.map((link) => `
         <a href="${ensureHttps(link.url)}" class="quick-link" target="_blank">
             ${link.title}
@@ -1599,10 +1602,11 @@ function togglePomodoro() {
     localStorage.setItem('pomodoroEnabled', pomodoroToggle.checked);
     pomodoro.style.display = pomodoroToggle.checked ? 'block' : 'none';
     
-    // Update the sidebar visibility based on both toggles
+    // Update the sidebar visibility based on any enabled feature
     const quickLinksEnabled = localStorage.getItem('quickLinksEnabled') === 'true';
+    const quoteEnabled = localStorage.getItem('quoteEnabled') === 'true';
     
-    if (pomodoroToggle.checked || quickLinksEnabled) {
+    if (pomodoroToggle.checked || quickLinksEnabled || quoteEnabled) {
         schedule.classList.add('with-quick-links');
     } else {
         schedule.classList.remove('with-quick-links');
@@ -1633,9 +1637,6 @@ function addPeriodStyles() {
     `;
     document.head.appendChild(style);
 }
-
-// Call this function when the page loads
-document.addEventListener('DOMContentLoaded', addPeriodStyles);
 
 // Add this function to create a better timer sound
 function playTimerCompleteSound() {
@@ -1792,54 +1793,11 @@ function closeQuickLinksEditor() {
 
 function resetAllSettings() {
     if (confirm('Are you sure you want to reset all settings? This action cannot be undone.')) {
-        // Clear name
-        localStorage.removeItem('userName');
-        
-        // Clear countdown preferences
-        localStorage.removeItem('showRoom');
-        localStorage.removeItem('showSubject');
-        
-        // Clear quick links
-        localStorage.removeItem('quickLinks');
-        localStorage.removeItem('quickLinksEnabled');
-        
-        // Clear notes
-        localStorage.removeItem('notes');
-        localStorage.removeItem('notepadEnabled');
-        
-        // Clear theme
-        localStorage.removeItem('theme');
-        
-        // Clear pomodoro settings
-        localStorage.removeItem('pomodoroEnabled');
-        
-        // Clear onboarding flag
-        localStorage.removeItem('onboardingComplete');
-
-        // Clear timetable data
-        localStorage.removeItem('userTimetable');
-        userTimetable = null;
-        
-        // Reset UI elements
-        document.getElementById('name-input').value = '';
-        document.getElementById('show-room').checked = true;
-        document.getElementById('show-subject').checked = true;
-        document.getElementById('quick-links-toggle').checked = false;
-        document.getElementById('notepad-toggle').checked = false;
-        document.getElementById('pomodoro-toggle').checked = false;
-        
-        // Reset displays
-        updateGreeting();
-        loadQuickLinks();
-        loadNotes();
-        setTheme('default');
-        updateSchedule(); // Update schedule display after clearing timetable
-        
-        // Close settings modal
-        toggleSettingsModal();
-        
-        // Show success message
-        alert('All settings have been reset successfully.');
+        // Wipe all local and session storage
+        localStorage.clear();
+        sessionStorage.clear();
+        // Reload the page immediately to prevent scripts from re-setting storage
+        location.reload();
     }
 }
 
@@ -1993,7 +1951,7 @@ function toggleQuote() {
     localStorage.setItem('quoteEnabled', quoteToggle.checked);
     quote.style.display = quoteToggle.checked ? 'block' : 'none';
     
-    // Update the sidebar visibility based on all toggles
+    // Update the sidebar visibility based on any enabled feature
     const quickLinksEnabled = localStorage.getItem('quickLinksEnabled') === 'true';
     const pomodoroEnabled = localStorage.getItem('pomodoroEnabled') === 'true';
     
@@ -2005,6 +1963,282 @@ function toggleQuote() {
 
     if (quoteToggle.checked) {
         fetchQuote();
+    }
+}
+
+// Exam Tracker Functions
+function toggleExamTracker() {
+    const examToggle = document.getElementById('exam-tracker-toggle');
+    const examTracker = document.getElementById('exam-tracker');
+    const schedule = document.querySelector('.schedule');
+    
+    localStorage.setItem('examTrackerEnabled', examToggle.checked);
+    examTracker.style.display = examToggle.checked ? 'block' : 'none';
+    
+    // Update the sidebar visibility based on any enabled feature
+    const quickLinksEnabled = localStorage.getItem('quickLinksEnabled') === 'true';
+    const pomodoroEnabled = localStorage.getItem('pomodoroEnabled') === 'true';
+    const quoteEnabled = localStorage.getItem('quoteEnabled') === 'true';
+    
+    if (examToggle.checked || quickLinksEnabled || pomodoroEnabled || quoteEnabled) {
+        schedule.classList.add('with-quick-links');
+    } else {
+        schedule.classList.remove('with-quick-links');
+    }
+
+    if (examToggle.checked) {
+        loadExams();
+        updateExamStats();
+    }
+}
+
+function openExamModal() {
+    document.getElementById('exam-modal').style.display = 'block';
+    // Set default date to today
+    document.getElementById('exam-date').value = new Date().toISOString().split('T')[0];
+}
+
+function closeExamModal() {
+    document.getElementById('exam-modal').style.display = 'none';
+    // Clear form
+    document.getElementById('exam-subject').value = '';
+    document.getElementById('exam-title').value = '';
+    document.getElementById('exam-score').value = '';
+    document.getElementById('exam-max-score').value = '100';
+    document.getElementById('exam-date').value = '';
+    document.getElementById('exam-notes').value = '';
+}
+
+function saveExam() {
+    const subject = document.getElementById('exam-subject').value.trim();
+    const title = document.getElementById('exam-title').value.trim();
+    const score = parseFloat(document.getElementById('exam-score').value);
+    const maxScore = parseFloat(document.getElementById('exam-max-score').value);
+    const weight = parseFloat(document.getElementById('exam-weight').value);
+    const date = document.getElementById('exam-date').value;
+    const notes = document.getElementById('exam-notes').value.trim();
+    
+    if (!subject || !title || isNaN(score) || isNaN(maxScore) || isNaN(weight) || !date) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    if (score < 0 || score > maxScore) {
+        alert('Score must be between 0 and ' + maxScore);
+        return;
+    }
+    if (weight < 1 || weight > 100) {
+        alert('Weight must be between 1 and 100');
+        return;
+    }
+    
+    const exam = {
+        id: Date.now(),
+        subject: subject,
+        title: title,
+        score: score,
+        maxScore: maxScore,
+        percentage: Math.round((score / maxScore) * 100),
+        weight: weight,
+        date: date,
+        notes: notes,
+        timestamp: new Date().toISOString()
+    };
+    
+    const exams = getExams();
+    exams.push(exam);
+    saveExams(exams);
+    
+    closeExamModal();
+    loadExams();
+    updateExamStats();
+}
+
+function getExams() {
+    const examsData = localStorage.getItem('exams');
+    return examsData ? JSON.parse(examsData) : [];
+}
+
+function saveExams(exams) {
+    localStorage.setItem('exams', JSON.stringify(exams));
+}
+
+function loadExams() {
+    const exams = getExams();
+    const examList = document.getElementById('exam-list');
+    
+    if (!examList) return;
+    
+    if (exams.length === 0) {
+        examList.innerHTML = '<p class="no-exams">No exams added yet</p>';
+        return;
+    }
+    
+    // Sort exams by date (newest first)
+    const sortedExams = exams.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Show only the 5 most recent exams in the sidebar
+    const recentExams = sortedExams.slice(0, 5);
+    
+    examList.innerHTML = recentExams.map(exam => `
+        <div class="exam-item">
+            <div class="exam-info">
+                <div class="exam-subject">${exam.subject}</div>
+                <div class="exam-title">${exam.title}</div>
+                <div class="exam-weight">Weight: ${exam.weight || 100}%</div>
+            </div>
+            <div class="exam-score">${exam.percentage}%</div>
+        </div>
+    `).join('');
+}
+
+function updateExamStats() {
+    const exams = getExams();
+    const avgScoreElement = document.getElementById('avg-score');
+    const totalExamsElement = document.getElementById('total-exams');
+    
+    if (!avgScoreElement || !totalExamsElement) return;
+    
+    if (exams.length === 0) {
+        avgScoreElement.textContent = '--';
+        totalExamsElement.textContent = '0';
+        return;
+    }
+    
+    // Weighted average calculation
+    let weightedSum = 0;
+    let totalWeight = 0;
+    exams.forEach(exam => {
+        weightedSum += exam.percentage * (exam.weight || 100);
+        totalWeight += (exam.weight || 100);
+    });
+    const avgScore = totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
+    
+    avgScoreElement.textContent = avgScore + '%';
+    totalExamsElement.textContent = exams.length;
+}
+
+function viewExamStats() {
+    // Always show the stats modal first
+    const statsModal = document.getElementById('exam-stats-modal');
+    if (statsModal) statsModal.style.display = 'block';
+    // Now update stats if elements exist
+    const exams = getExams();
+    if (exams.length === 0) {
+        alert('No exams to display');
+        return;
+    }
+    // Weighted average calculation
+    let weightedSum = 0;
+    let totalWeight = 0;
+    exams.forEach(exam => {
+        weightedSum += exam.percentage * (exam.weight || 100);
+        totalWeight += (exam.weight || 100);
+    });
+    const avgScore = totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
+    const highestScore = Math.max(...exams.map(exam => exam.percentage));
+    const lowestScore = Math.min(...exams.map(exam => exam.percentage));
+    
+    document.getElementById('stats-avg-score').textContent = avgScore + '%';
+    document.getElementById('stats-total-exams').textContent = exams.length;
+    document.getElementById('stats-highest-score').textContent = highestScore + '%';
+    document.getElementById('stats-lowest-score').textContent = lowestScore + '%';
+    
+    // Generate subject breakdown (weighted)
+    const subjectStats = {};
+    exams.forEach(exam => {
+        if (!subjectStats[exam.subject]) {
+            subjectStats[exam.subject] = { sum: 0, weight: 0, count: 0 };
+        }
+        subjectStats[exam.subject].sum += exam.percentage * (exam.weight || 100);
+        subjectStats[exam.subject].weight += (exam.weight || 100);
+        subjectStats[exam.subject].count += 1;
+    });
+    const subjectStatsHtml = Object.entries(subjectStats).map(([subject, data]) => {
+        const avg = data.weight > 0 ? Math.round(data.sum / data.weight) : 0;
+        return `
+            <div class=\"subject-stat clickable\" onclick=\"showSubjectAnalytics('${subject.replace(/'/g, "\\'")}')\">
+                <div class=\"subject-name\">${subject}</div>
+                <div class=\"subject-avg\">${avg}% (${data.count} exam${data.count > 1 ? 's' : ''})</div>
+            </div>
+        `;
+    }).join('');
+    // Only update if elements exist
+    const subjectStatsElem = document.getElementById('subject-stats');
+    if (subjectStatsElem) subjectStatsElem.innerHTML = subjectStatsHtml;
+    
+    // Generate subject averages dashboard
+    const subjectAverages = {};
+    exams.forEach(exam => {
+        if (!subjectAverages[exam.subject]) {
+            subjectAverages[exam.subject] = { sum: 0, weight: 0 };
+        }
+        subjectAverages[exam.subject].sum += exam.percentage * (exam.weight || 100);
+        subjectAverages[exam.subject].weight += (exam.weight || 100);
+    });
+    const subjectAveragesHtml = Object.entries(subjectAverages).map(([subject, data]) => {
+        const avg = data.weight > 0 ? Math.round(data.sum / data.weight) : 0;
+        return `<div class='subject-averages-card'><div class='subject-averages-card-label'>${subject}</div><div class='subject-averages-card-value'>${avg}%</div></div>`;
+    }).join('');
+    // Only update if elements exist
+    const subjectAveragesCardsElem = document.getElementById('subject-averages-cards');
+    if (subjectAveragesCardsElem) subjectAveragesCardsElem.innerHTML = subjectAveragesHtml;
+    
+    // Generate timeline chart
+    const sortedExams = exams.sort((a, b) => new Date(a.date) - new Date(b.date));
+    const timelineHtml = sortedExams.map(exam => {
+        const height = (exam.percentage / 100) * 150; // Max height 150px
+        const date = new Date(exam.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return `
+            <div class="timeline-bar" style="height: ${height}px;" title="${exam.subject} - ${exam.title}: ${exam.percentage}%">
+                <div class="timeline-label">${date}</div>
+            </div>
+        `;
+    }).join('');
+    
+    document.getElementById('exam-timeline').innerHTML = timelineHtml;
+    
+    // Generate full exam list
+    let fullExamListHtml = '';
+    if (sortedExams.length === 0) {
+        fullExamListHtml = `<div class='no-exams'>No exams found.</div>`;
+    } else {
+        fullExamListHtml = sortedExams.reverse().map(exam => {
+            const date = new Date(exam.date).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            return `
+                <div class="full-exam-item">
+                    <div class="full-exam-info">
+                        <div class="full-exam-subject">${exam.subject}</div>
+                        <div class="full-exam-title">${exam.title}</div>
+                        <div class="full-exam-date">${date}</div>
+                        <div class="full-exam-weight">Weight: ${exam.weight || 100}%</div>
+                    </div>
+                    <div class="full-exam-score">${exam.percentage}%</div>
+                    <button class="delete-exam-btn" onclick="deleteExam(${exam.id})">Delete</button>
+                </div>
+            `;
+        }).join('');
+    }
+    const fullExamListElem = document.getElementById('full-exam-list');
+    if (fullExamListElem) fullExamListElem.innerHTML = fullExamListHtml;
+}
+
+function closeExamStatsModal() {
+    document.getElementById('exam-stats-modal').style.display = 'none';
+}
+
+function deleteExam(examId) {
+    if (confirm('Are you sure you want to delete this exam?')) {
+        const exams = getExams();
+        const updatedExams = exams.filter(exam => exam.id !== examId);
+        saveExams(updatedExams);
+        loadExams();
+        updateExamStats();
+        viewExamStats(); // Refresh the stats modal
     }
 }
 
@@ -2213,3 +2447,589 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDragHandles();
     loadTileOrder();
 });
+
+// ... existing code ...
+
+// Games functions
+let isGameFullscreen = false;
+
+function toggleGames() {
+    const gamesTile = document.getElementById('games-tile');
+    const isChecked = document.getElementById('games-toggle').checked;
+    
+    gamesTile.style.display = isChecked ? 'block' : 'none';
+    
+    // Save preference
+    localStorage.setItem('gamesEnabled', isChecked.toString());
+}
+
+function openGamesModal() {
+    const gamesModal = document.getElementById('games-modal');
+    gamesModal.style.display = 'flex';
+    
+    // Add click event to game cards if not already added
+    const gameCards = document.querySelectorAll('.game-card');
+    gameCards.forEach(card => {
+        if (!card.dataset.eventAdded) {
+            card.addEventListener('click', () => {
+                const gameUrl = card.dataset.gameUrl;
+                openGamePlayer(gameUrl);
+            });
+            card.dataset.eventAdded = 'true';
+        }
+    });
+}
+
+function toggleGamesModal() {
+    const gamesModal = document.getElementById('games-modal');
+    if (gamesModal.style.display === 'flex') {
+        gamesModal.style.display = 'none';
+    } else {
+        gamesModal.style.display = 'flex';
+    }
+}
+
+// Updated openGamePlayer function
+function openGamePlayer(gameUrl) {
+    // Hide games modal
+    document.getElementById('games-modal').style.display = 'none';
+    
+    // Show game player modal
+    const gamePlayerModal = document.getElementById('game-player-modal');
+    gamePlayerModal.style.display = 'flex';
+    
+    // Set iframe source
+    const gameIframe = document.getElementById('game-iframe');
+    
+    // Add zoom for Wordle
+    if (gameUrl.includes('wordle')) {
+        gameUrl += '#zoom=150%';
+    }
+    
+    gameIframe.src = gameUrl;
+    
+    // Add focus to iframe for immediate keyboard control
+    setTimeout(() => {
+        gameIframe.focus();
+        
+        // Try to simulate a click on the iframe to activate keyboard controls
+        try {
+            const iframeDoc = gameIframe.contentDocument || gameIframe.contentWindow.document;
+            iframeDoc.body.click();
+        } catch (e) {
+            console.log('Cannot access iframe content due to same-origin policy');
+        }
+    }, 500);
+}
+
+// Updated Game Player Modal HTML
+function closeGamePlayer() {
+    // Hide game player modal
+    document.getElementById('game-player-modal').style.display = 'none';
+    
+    // Clear iframe src to stop game
+    document.getElementById('game-iframe').src = '';
+}
+
+// Load games preferences
+function loadGamesPreferences() {
+    const isGamesEnabled = localStorage.getItem('gamesEnabled') === 'true';
+    document.getElementById('games-toggle').checked = isGamesEnabled;
+    document.getElementById('games-tile').style.display = isGamesEnabled ? 'block' : 'none';
+}
+
+// Escape key handler for game player
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && document.getElementById('game-player-modal').style.display === 'flex') {
+        closeGamePlayer();
+    }
+});
+
+// Initialize games feature
+function initializeGames() {
+    loadGamesPreferences();
+    
+    // Ensure modals are set up correctly
+    document.getElementById('games-modal').style.display = 'none';
+    document.getElementById('game-player-modal').style.display = 'none';
+}
+
+// Function to update sidebar visibility based on all enabled features
+function updateSidebarVisibility() {
+    const schedule = document.querySelector('.schedule');
+    const quickLinksEnabled = localStorage.getItem('quickLinksEnabled') === 'true';
+    const pomodoroEnabled = localStorage.getItem('pomodoroEnabled') === 'true';
+    const quoteEnabled = localStorage.getItem('quoteEnabled') === 'true';
+    const examTrackerEnabled = localStorage.getItem('examTrackerEnabled') === 'true';
+    
+    if (quickLinksEnabled || pomodoroEnabled || quoteEnabled || examTrackerEnabled) {
+        schedule.classList.add('with-quick-links');
+    } else {
+        schedule.classList.remove('with-quick-links');
+    }
+}
+
+// Update loadQuickLinks to use the new updateSidebarVisibility function
+function loadQuickLinks() {
+    const quickLinksEnabled = localStorage.getItem('quickLinksEnabled') === 'true';
+    const pomodoroEnabled = localStorage.getItem('pomodoroEnabled') === 'true';
+    const quoteEnabled = localStorage.getItem('quoteEnabled') === 'true';
+    const examTrackerEnabled = localStorage.getItem('examTrackerEnabled') === 'true';
+    const quickLinksToggle = document.getElementById('quick-links-toggle');
+    const pomodoroToggle = document.getElementById('pomodoro-toggle');
+    const quoteToggle = document.getElementById('quote-toggle');
+    const examTrackerToggle = document.getElementById('exam-tracker-toggle');
+    const quickLinks = document.getElementById('quick-links');
+    const pomodoro = document.getElementById('pomodoro');
+    const quote = document.getElementById('quote-of-day');
+    const examTracker = document.getElementById('exam-tracker');
+    const quickLinksList = document.querySelector('.quick-links-list');
+    
+    // Set the toggle states
+    quickLinksToggle.checked = quickLinksEnabled;
+    pomodoroToggle.checked = pomodoroEnabled;
+    quoteToggle.checked = quoteEnabled;
+    examTrackerToggle.checked = examTrackerEnabled;
+    
+    // Update displays
+    quickLinks.style.display = quickLinksEnabled ? 'block' : 'none';
+    pomodoro.style.display = pomodoroEnabled ? 'block' : 'none';
+    quote.style.display = quoteEnabled ? 'block' : 'none';
+    examTracker.style.display = examTrackerEnabled ? 'block' : 'none';
+    
+    // Update sidebar visibility
+    updateSidebarVisibility();
+    
+    // Load saved links or use defaults
+    const savedLinks = JSON.parse(localStorage.getItem('quickLinks')) || defaultQuickLinks;
+    quickLinksList.innerHTML = savedLinks.map((link) => `
+        <a href="${ensureHttps(link.url)}" class="quick-link" target="_blank">
+            ${link.title}
+        </a>
+    `).join('');
+    
+    // Load exam tracker data if enabled
+    if (examTrackerEnabled) {
+        loadExams();
+        updateExamStats();
+    }
+}
+
+// Call updateSidebarVisibility when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    updateSidebarVisibility();
+});
+
+// Check if user is first time visitor
+function checkFirstTimeUser() {
+    if (!localStorage.getItem('firstTimeUser')) {
+        window.location.href = 'landing.html';
+        return;
+    }
+    // If setupCompleted is not set and not coming from setup, redirect to landing
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!localStorage.getItem('setupCompleted') && urlParams.get('setup') !== 'true') {
+        window.location.href = 'landing.html';
+        return;
+    }
+}
+
+// Handle setup process
+function handleSetup() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('setup') === 'true') {
+        // Show setup modal
+        showSetupModal();
+    }
+}
+
+// Show setup modal
+function showSetupModal() {
+    // Remove any existing modal
+    const oldModal = document.querySelector('.modal');
+    if (oldModal) oldModal.remove();
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content setup-modal" style="max-width: 600px;">
+            <h3>Welcome to Baulko Bell Times!</h3>
+            <p>Let's get you set up step by step.</p>
+            <div class="setup-steps">
+                <div class="setup-step" id="name-step">
+                    <h4>Step 1: Enter Your Name</h4>
+                    <p>Personalize your experience by adding your name.</p>
+                    <div class="setup-input">
+                        <input type="text" id="setup-name" placeholder="Enter your name" class="name-input">
+                        <button id="save-name-btn" class="setup-btn">Save Name</button>
+                    </div>
+                </div>
+                <div class="setup-step" id="timetable-step" style="display: none;">
+                    <h4>Step 2: Import Your Timetable</h4>
+                    <p>Start by importing your school timetable to get your schedule set up.</p>
+                    <div class="setup-input">
+                        <input type="file" id="timetable-file" accept=".csv,.json" class="file-input">
+                        <button id="upload-timetable-btn" class="setup-btn">Upload Timetable</button>
+                    </div>
+                </div>
+                <div class="setup-step" id="theme-step" style="display: none;">
+                    <h4>Step 3: Choose Your Theme</h4>
+                    <p>Select a theme that matches your style.</p>
+                    <div class="theme-grid setup-theme-grid">
+                        <button data-theme="default" class="theme-btn default-theme"><span class="theme-preview"></span>Default</button>
+                        <button data-theme="dark" class="theme-btn dark-theme"><span class="theme-preview"></span>Dark</button>
+                        <button data-theme="light" class="theme-btn light-theme"><span class="theme-preview"></span>Light</button>
+                        <button data-theme="purple" class="theme-btn purple-theme"><span class="theme-preview"></span>Purple</button>
+                        <button data-theme="green" class="theme-btn green-theme"><span class="theme-preview"></span>Green</button>
+                        <button data-theme="ocean" class="theme-btn ocean-theme"><span class="theme-preview"></span>Ocean</button>
+                        <button data-theme="sunset" class="theme-btn sunset-theme"><span class="theme-preview"></span>Sunset</button>
+                        <button data-theme="minimal" class="theme-btn minimal-theme"><span class="theme-preview"></span>Minimal</button>
+                        <button data-theme="retro" class="theme-btn retro-theme"><span class="theme-preview"></span>Retro</button>
+                        <button data-theme="forest" class="theme-btn forest-theme"><span class="theme-preview"></span>Forest</button>
+                        <button data-theme="candy" class="theme-btn candy-theme"><span class="theme-preview"></span>Candy</button>
+                        <button data-theme="coffee" class="theme-btn coffee-theme"><span class="theme-preview"></span>Coffee</button>
+                        <button data-theme="mint" class="theme-btn mint-theme"><span class="theme-preview"></span>Mint</button>
+                        <button data-theme="coral" class="theme-btn coral-theme"><span class="theme-preview"></span>Coral</button>
+                        <button data-theme="lavender" class="theme-btn lavender-theme"><span class="theme-preview"></span>Lavender</button>
+                    </div>
+                    <h4>Dynamic Themes</h4>
+                    <div class="theme-grid setup-theme-grid">
+                        <button data-theme="time" class="theme-btn dynamic-time-theme"><span class="theme-preview"></span>Time Based</button>
+                        <button data-theme="season" class="theme-btn dynamic-season-theme"><span class="theme-preview"></span>Seasonal</button>
+                        <button data-theme="study" class="theme-btn dynamic-study-theme"><span class="theme-preview"></span>Study Focus</button>
+                        <button data-theme="energy" class="theme-btn dynamic-energy-theme"><span class="theme-preview"></span>Energy</button>
+                    </div>
+                    <button id="save-theme-btn" class="setup-btn" style="margin-top: 1rem;">Save Theme</button>
+                </div>
+                <div class="setup-step" id="extension-step" style="display: none;">
+                    <h4>Step 4: Chrome Extension</h4>
+                    <p>Get instant access to your schedule with our Chrome extension.</p>
+                    <div class="extension-steps">
+                        <ol>
+                            <li>Visit the Chrome Web Store</li>
+                            <li>Search for "Baulko Bell Times"</li>
+                            <li>Click "Add to Chrome"</li>
+                            <li>Enjoy quick access to your schedule!</li>
+                        </ol>
+                    </div>
+                    <button id="complete-setup-btn" class="setup-btn">Complete Setup</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Name step
+    document.getElementById('save-name-btn').onclick = function() {
+        const name = document.getElementById('setup-name').value.trim();
+        if (name) {
+            localStorage.setItem('userName', name);
+            document.getElementById('name-step').style.display = 'none';
+            document.getElementById('timetable-step').style.display = 'block';
+        }
+    };
+    // Timetable step
+    document.getElementById('upload-timetable-btn').onclick = function() {
+        const fileInput = document.getElementById('timetable-file');
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const timetable = JSON.parse(e.target.result);
+                    localStorage.setItem('timetable', JSON.stringify(timetable));
+                    document.getElementById('timetable-step').style.display = 'none';
+                    document.getElementById('theme-step').style.display = 'block';
+                } catch (error) {
+                    alert('Invalid timetable file. Please try again.');
+                }
+            };
+            reader.readAsText(file);
+        }
+    };
+    // Theme step
+    let selectedTheme = null;
+    document.querySelectorAll('.setup-theme-grid .theme-btn').forEach(btn => {
+        btn.onclick = function() {
+            document.querySelectorAll('.setup-theme-grid .theme-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedTheme = btn.getAttribute('data-theme');
+        };
+    });
+    document.getElementById('save-theme-btn').onclick = function() {
+        if (selectedTheme) {
+            localStorage.setItem('selectedTheme', selectedTheme);
+            if (typeof setTheme === 'function') setTheme(selectedTheme);
+            document.getElementById('theme-step').style.display = 'none';
+            document.getElementById('extension-step').style.display = 'block';
+        }
+    };
+    // Extension step
+    document.getElementById('complete-setup-btn').onclick = function() {
+        localStorage.setItem('setupCompleted', 'true');
+        // Remove ?setup from URL
+        const url = new URL(window.location.href);
+        url.searchParams.delete('setup');
+        window.history.replaceState({}, '', url);
+        modal.remove();
+    };
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('setup') === 'true') {
+        // Always show setup modal if ?setup=true
+        showSetupModal();
+        return;
+    }
+    // If setupCompleted is not set, redirect to landing
+    if (!localStorage.getItem('setupCompleted')) {
+        window.location.href = 'landing.html';
+        return;
+    }
+});
+
+window.addEventListener('DOMContentLoaded', function() {
+    if (!localStorage.getItem('setupCompleted')) {
+        showSetupModal();
+    }
+});
+
+window.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('setupCompleted') && localStorage.getItem('firstTimeUser') === 'false' && !localStorage.getItem('homepageTooltipShown')) {
+        // Show tooltip
+        const tooltip = document.createElement('div');
+        tooltip.id = 'homepage-tooltip';
+        tooltip.style.position = 'fixed';
+        tooltip.style.top = '24px';
+        tooltip.style.left = '50%';
+        tooltip.style.transform = 'translateX(-50%)';
+        tooltip.style.background = 'var(--card-background, #fff)';
+        tooltip.style.color = 'var(--text-color, #333)';
+        tooltip.style.border = '1.5px solid var(--primary-color, #6200ea)';
+        tooltip.style.borderRadius = '12px';
+        tooltip.style.boxShadow = '0 4px 16px rgba(0,0,0,0.10)';
+        tooltip.style.padding = '1.2rem 2rem 1.2rem 1.5rem';
+        tooltip.style.zIndex = '9999';
+        tooltip.style.fontFamily = "'Montserrat', 'Open Sans', sans-serif";
+        tooltip.style.fontSize = '1.05rem';
+        tooltip.style.display = 'flex';
+        tooltip.style.alignItems = 'center';
+        tooltip.style.gap = '1rem';
+        tooltip.innerHTML = `
+            <span style="display: flex; align-items: center; gap: 0.5rem;">
+                Click the <span class="material-icons" style="color: var(--primary-color, #6200ea); font-size: 1.3rem; vertical-align: middle;">settings</span> icon to customise themes, import your timetable, add your name, and install the Chrome extension.
+            </span>
+            <button id="close-tooltip-btn" style="background: none; border: none; color: var(--primary-color, #6200ea); font-size: 1.5rem; cursor: pointer; margin-left: 1rem;">&times;</button>
+        `;
+        document.body.appendChild(tooltip);
+        document.getElementById('close-tooltip-btn').onclick = function() {
+            tooltip.remove();
+            localStorage.setItem('homepageTooltipShown', 'true');
+        };
+    }
+});
+
+// Modern settings modal tab navigation
+window.addEventListener('DOMContentLoaded', function() {
+    const navBtns = document.querySelectorAll('.settings-nav-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            navBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const tab = btn.getAttribute('data-tab');
+            tabContents.forEach(tc => tc.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+        });
+    });
+});
+
+// ... existing code ...
+// Fix close button for settings modal
+window.addEventListener('DOMContentLoaded', function() {
+    var closeBtn = document.querySelector('#settings-modal .close-btn');
+    if (closeBtn) {
+        closeBtn.onclick = function(e) {
+            e.stopPropagation();
+            document.getElementById('settings-modal').style.display = 'none';
+        };
+    }
+});
+// ... existing code ...
+
+function showSubjectAnalytics(subject) {
+    const exams = getExams().filter(e => e.subject === subject);
+    if (exams.length === 0) return;
+    document.getElementById('subject-analytics-title').textContent = `Subject Analytics: ${subject}`;
+    // Stats
+    let weightedSum = 0, totalWeight = 0, highest = -Infinity, lowest = Infinity, mostRecent = null;
+    exams.forEach(exam => {
+        weightedSum += exam.percentage * (exam.weight || 100);
+        totalWeight += (exam.weight || 100);
+        if (exam.percentage > highest) highest = exam.percentage;
+        if (exam.percentage < lowest) lowest = exam.percentage;
+        if (!mostRecent || new Date(exam.date) > new Date(mostRecent.date)) mostRecent = exam;
+    });
+    const avg = totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
+    const statsHtml = `
+        <div class='subject-analytics-stat'><div class='subject-analytics-stat-label'>Weighted Avg</div><div class='subject-analytics-stat-value'>${avg}%</div></div>
+        <div class='subject-analytics-stat'><div class='subject-analytics-stat-label'>Highest</div><div class='subject-analytics-stat-value'>${highest}%</div></div>
+        <div class='subject-analytics-stat'><div class='subject-analytics-stat-label'>Lowest</div><div class='subject-analytics-stat-value'>${lowest}%</div></div>
+        <div class='subject-analytics-stat'><div class='subject-analytics-stat-label'>Most Recent</div><div class='subject-analytics-stat-value'>${mostRecent ? mostRecent.percentage + '%' : '--'}</div></div>
+    `;
+    document.getElementById('subject-analytics-stats').innerHTML = statsHtml;
+    // List
+    const listHtml = exams.sort((a, b) => new Date(b.date) - new Date(a.date)).map(exam => {
+        const date = new Date(exam.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        return `
+            <div class='subject-analytics-exam-item'>
+                <div class='subject-analytics-exam-info'>
+                    <div class='subject-analytics-exam-title'>${exam.title}</div>
+                    <div class='subject-analytics-exam-date'>${date}</div>
+                    <div class='subject-analytics-exam-weight'>Weight: ${exam.weight || 100}%</div>
+                    ${exam.notes ? `<div class='subject-analytics-exam-notes'>${exam.notes}</div>` : ''}
+                </div>
+                <div class='subject-analytics-exam-score'>${exam.percentage}%</div>
+                <button class='subject-analytics-edit-btn' onclick='editExam(${exam.id})'>Edit</button>
+            </div>
+        `;
+    }).join('');
+    document.getElementById('subject-analytics-list').innerHTML = listHtml;
+    // Graph
+    document.getElementById('subject-analytics-graph').innerHTML = renderSubjectGraph(exams);
+    document.getElementById('subject-analytics-modal').style.display = 'block';
+}
+function closeSubjectAnalyticsModal() {
+    document.getElementById('subject-analytics-modal').style.display = 'none';
+}
+function renderSubjectGraph(exams) {
+    if (!exams.length) return '';
+    // Sort by date ascending
+    const sorted = exams.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+    const n = sorted.length;
+    const width = Math.max(340, 48 * (n-1) + 80); // min 340px, 48px per point
+    const height = 220;
+    const margin = { left: 44, right: 24, top: 30, bottom: 40 };
+    // Y scale
+    const minY = 0;
+    const maxY = 100;
+    const y = p => margin.top + (height - margin.top - margin.bottom) * (1 - p/100);
+    // X scale
+    const x = i => margin.left + i * ((width - margin.left - margin.right) / Math.max(1, n-1));
+    // Smooth curve path
+    function getSmoothPath(points) {
+        if (points.length < 2) return '';
+        let d = `M${points[0][0]},${points[0][1]}`;
+        for (let i = 0; i < points.length-1; i++) {
+            const [x1, y1] = points[i];
+            const [x2, y2] = points[i+1];
+            const mx = (x1 + x2) / 2;
+            d += ` Q${mx},${y1} ${x2},${y2}`;
+        }
+        return d;
+    }
+    const points = sorted.map((exam, i) => [x(i), y(exam.percentage)]);
+    const path = getSmoothPath(points);
+    // Area fill under curve
+    const areaPath = path + ` L${x(n-1)},${y(0)} L${x(0)},${y(0)} Z`;
+    // Y gridlines and labels
+    const gridYs = [100, 80, 60, 40, 20, 0];
+    const gridLines = gridYs.map(val => `<line x1='${margin.left}' y1='${y(val)}' x2='${width-margin.right}' y2='${y(val)}' stroke='#e6dbfa' stroke-width='1'/><text x='${margin.left-10}' y='${y(val)+4}' font-size='12' fill='#888' text-anchor='end'>${val}%</text>`).join('');
+    // X labels
+    const labels = sorted.map((exam, i) => {
+        const date = new Date(exam.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return `<text x='${x(i)}' y='${height-margin.bottom+20}' font-size='12' text-anchor='middle' fill='#666'>${date}</text>`;
+    }).join('');
+    // Dots with tooltips
+    const circles = sorted.map((exam, i) => {
+        return `<g>
+            <circle cx='${x(i)}' cy='${y(exam.percentage)}' r='8' fill='white' stroke='var(--primary-color)' stroke-width='3'/>
+            <circle cx='${x(i)}' cy='${y(exam.percentage)}' r='5' fill='var(--primary-color)'/>
+            <title>${exam.title}: ${exam.percentage}%\n${new Date(exam.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</title>
+        </g>`;
+    }).join('');
+    return `<svg width='100%' height='${height}' viewBox='0 0 ${width} ${height}' style='max-width:480px;'>
+        <rect x='0' y='0' width='${width}' height='${height}' fill='none'/>
+        ${gridLines}
+        <path d='${areaPath}' fill='url(#subjectAreaGradient)' opacity='0.18'/>
+        <defs>
+            <linearGradient id='subjectAreaGradient' x1='0' y1='0' x2='0' y2='1'>
+                <stop offset='0%' stop-color='var(--primary-color)' stop-opacity='0.5'/>
+                <stop offset='100%' stop-color='var(--primary-color)' stop-opacity='0.1'/>
+            </linearGradient>
+        </defs>
+        <path d='${path}' fill='none' stroke='var(--primary-color)' stroke-width='4' />
+        ${circles}
+        ${labels}
+    </svg>`;
+}
+// Exam editing support
+let editingExamId = null;
+function editExam(examId) {
+    const exams = getExams();
+    const exam = exams.find(e => e.id === examId);
+    if (!exam) return;
+    editingExamId = examId;
+    // Always close analytics/stats modals before opening edit modal
+    closeSubjectAnalyticsModal();
+    if (document.getElementById('exam-stats-modal')) document.getElementById('exam-stats-modal').style.display = 'none';
+    document.getElementById('exam-subject').value = exam.subject;
+    document.getElementById('exam-title').value = exam.title;
+    document.getElementById('exam-score').value = exam.score;
+    document.getElementById('exam-max-score').value = exam.maxScore;
+    document.getElementById('exam-weight').value = exam.weight;
+    document.getElementById('exam-date').value = exam.date;
+    document.getElementById('exam-notes').value = exam.notes;
+    document.getElementById('exam-modal').style.display = 'block';
+}
+// Update saveExam to support editing
+function saveExam() {
+    const subject = document.getElementById('exam-subject').value.trim();
+    const title = document.getElementById('exam-title').value.trim();
+    const score = parseFloat(document.getElementById('exam-score').value);
+    const maxScore = parseFloat(document.getElementById('exam-max-score').value);
+    const weight = parseFloat(document.getElementById('exam-weight').value);
+    const date = document.getElementById('exam-date').value;
+    const notes = document.getElementById('exam-notes').value.trim();
+    if (!subject || !title || isNaN(score) || isNaN(maxScore) || isNaN(weight) || !date) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    if (score < 0 || score > maxScore) {
+        alert('Score must be between 0 and ' + maxScore);
+        return;
+    }
+    if (weight < 1 || weight > 100) {
+        alert('Weight must be between 1 and 100');
+        return;
+    }
+    let exams = getExams();
+    if (editingExamId) {
+        exams = exams.map(e => e.id === editingExamId ? {
+            ...e,
+            subject, title, score, maxScore, weight, date, notes,
+            percentage: Math.round((score / maxScore) * 100),
+        } : e);
+        editingExamId = null;
+    } else {
+        const exam = {
+            id: Date.now(),
+            subject: subject,
+            title: title,
+            score: score,
+            maxScore: maxScore,
+            percentage: Math.round((score / maxScore) * 100),
+            weight: weight,
+            date: date,
+            notes: notes,
+            timestamp: new Date().toISOString()
+        };
+        exams.push(exam);
+    }
+    saveExams(exams);
+    closeExamModal();
+    loadExams();
+    updateExamStats();
+    closeSubjectAnalyticsModal(); // Refresh subject modal if open
+}
