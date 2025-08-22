@@ -9,7 +9,9 @@ const SCHOOL_NAME = "Baulko";
 const DEFAULT_QUICK_LINKS = [
     { title: 'Moodle', url: 'http://web1.baulkham-h.schools.nsw.edu.au' },
     { title: 'Sentral', url: 'https://baulkham-h.sentral.com.au' },
-    { title: 'Classroom', url: 'https://classroom.google.com' }
+    { title: 'Classroom', url: 'https://classroom.google.com' },
+    { title: 'Study Music', url: 'https://anycircle11139s.github.io/Music/' },
+    { title: 'ToDo List', url: 'https://thetodolist.github.io' }
 ];
 
 // Bell Times Schedule - Define the daily schedule for each day
@@ -1255,7 +1257,9 @@ document.getElementById('notes-content').addEventListener('input', saveNotes);
 const defaultQuickLinks = [
     { title: 'Moodle', url: 'http://web1.baulkham-h.schools.nsw.edu.au' },
     { title: 'Sentral', url: 'https://baulkham-h.sentral.com.au' },
-    { title: 'Classroom', url: 'https://classroom.google.com' }
+    { title: 'Classroom', url: 'https://classroom.google.com' },
+    { title: 'Study Music', url: 'https://anycircle11139s.github.io/Music/' },
+    { title: 'Todo List', url: 'https://thetodolist.github.io' }
 ];
 
 function toggleQuickLinks() {
