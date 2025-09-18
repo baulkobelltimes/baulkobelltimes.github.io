@@ -11,11 +11,11 @@ const DEFAULT_QUICK_LINKS = [
     { title: 'Sentral', url: 'https://baulkham-h.sentral.com.au' },
     { title: 'Classroom', url: 'https://classroom.google.com' },
     { title: 'Study Music', url: 'https://anycircle11139s.github.io/Music/' },
-    { title: 'ToDo List', url: 'https://thetodolist.github.io' }
+    { title: 'To-Do List', url: 'https://thetodolist.github.io' }
 ];
 
 // Bell Times Schedule - Define the daily schedule for each day
-const BELL_TIMES = {
+const BELL_TMES = {
     Monday: [
         { name: "Roll Call", time: "08:38 AM" },
         { name: "Period 1", time: "08:44 AM" },
@@ -1259,7 +1259,7 @@ const defaultQuickLinks = [
     { title: 'Sentral', url: 'https://baulkham-h.sentral.com.au' },
     { title: 'Classroom', url: 'https://classroom.google.com' },
     { title: 'Study Music', url: 'https://anycircle11139s.github.io/Music/' },
-    { title: 'Todo List', url: 'https://thetodolist.github.io' }
+    { title: 'To-do List', url: 'https://thetodolist.github.io' }
 ];
 
 function toggleQuickLinks() {
