@@ -15,7 +15,7 @@ const DEFAULT_QUICK_LINKS = [
 ];
 
 // Bell Times Schedule - Define the daily schedule for each day
-const BELL_TMES = {
+const BELL_TIMES = {
     Monday: [
         { name: "Roll Call", time: "08:38 AM" },
         { name: "Period 1", time: "08:44 AM" },
