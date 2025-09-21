@@ -463,16 +463,12 @@ updateGreeting(); // Initial call
 updateSchedule(); // Initial call
 
 function initializeUser() {
-    const onboardingComplete = localStorage.getItem('onboardingComplete') === 'true';
-    if (!onboardingComplete) {
-        showWelcomeModal();
-    } else {
-        // Set the name in the settings input if it exists
-        const userName = localStorage.getItem('userName');
-        const nameInput = document.getElementById('name-input');
-        if (nameInput && userName) {
-            nameInput.value = userName;
-        }
+    // Onboarding disabled: do not show welcome modal
+    // Just prefill name input if it exists
+    const userName = localStorage.getItem('userName');
+    const nameInput = document.getElementById('name-input');
+    if (nameInput && userName) {
+        nameInput.value = userName;
     }
 }
 
@@ -2626,16 +2622,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Check if user is first time visitor
 function checkFirstTimeUser() {
-    if (!localStorage.getItem('firstTimeUser')) {
-        window.location.href = 'landing.html';
-        return;
-    }
-    // If setupCompleted is not set and not coming from setup, redirect to landing
-    const urlParams = new URLSearchParams(window.location.search);
-    if (!localStorage.getItem('setupCompleted') && urlParams.get('setup') !== 'true') {
-        window.location.href = 'landing.html';
-        return;
-    }
+    // First-time/setup redirect disabled: always stay on main page
+    return;
 }
 
 // Handle setup process
@@ -2786,17 +2774,12 @@ window.addEventListener('DOMContentLoaded', function() {
         showSetupModal();
         return;
     }
-    // If setupCompleted is not set, redirect to landing
-    if (!localStorage.getItem('setupCompleted')) {
-        window.location.href = 'landing.html';
-        return;
-    }
+    // Setup completion check disabled: do not redirect to landing
 });
 
 window.addEventListener('DOMContentLoaded', function() {
-    if (!localStorage.getItem('setupCompleted')) {
-        showSetupModal();
-    }
+    // Setup modal auto-display disabled
+    return;
 });
 
 window.addEventListener('DOMContentLoaded', function() {
