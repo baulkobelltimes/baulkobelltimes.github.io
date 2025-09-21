@@ -112,6 +112,39 @@ const TIMER_MODES = {
 };
 
 // ==============================================
+// ADS CONFIGURATION
+// ==============================================
+
+function initializeAds() {
+    // Ads are enabled by default unless explicitly disabled
+    const adsEnabled = localStorage.getItem('adsEnabled') !== 'false';
+    const adsToggle = document.getElementById('ads-toggle');
+    if (adsToggle) {
+        adsToggle.checked = adsEnabled;
+    }
+
+    // If ads are disabled, don't do anything else
+    if (!adsEnabled) {
+        return;
+    }
+
+    // If enabled, check if the script already exists to prevent duplicates
+    if (!document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
+        const adScript = document.createElement('script');
+        adScript.async = true;
+        adScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6495491558279009";
+        adScript.crossOrigin = "anonymous";
+        document.head.appendChild(adScript);
+    }
+}
+
+function toggleAds(isEnabled) {
+    localStorage.setItem('adsEnabled', isEnabled);
+    alert("Your ad settings have been saved. The page will now reload to apply the changes.");
+    location.reload();
+}
+
+// ==============================================
 // APPLICATION CODE BELOW
 // ==============================================
 
@@ -461,6 +494,7 @@ setInterval(() => {
 
 updateGreeting(); // Initial call
 updateSchedule(); // Initial call
+initializeAds(); // Initialize ads on page load
 
 function initializeUser() {
     // Onboarding disabled: do not show welcome modal
