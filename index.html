@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baulko Bell Times</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Baulko Bell Times - Your personal school schedule assistant. Track class times, manage your timetable, and stay organized with our intuitive bell times display.">
+    <meta name="keywords" content="school bell times, class schedule, timetable, student organizer, school planner, Baulko">
+    <meta name="author" content="Shaarav4795">
+    <meta name="robots" content="index, follow">
+    <meta name="google-adsense-account" content="ca-pub-6495491558279009">
+    
+    <!-- Open Graph Meta Tags for Social Media -->
+    <meta property="og:title" content="Baulko Bell Times">
+    <meta property="og:description" content="Your personal school schedule assistant. Track class times, manage your timetable, and stay organized.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://baulkobelltimes.github.io">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Baulko Bell Times">
+    <meta name="twitter:description" content="Your personal school schedule assistant. Track class times, manage your timetable, and stay organized.">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://baulkobelltimes.github.io">
+    
+    <link rel="stylesheet" href="styles.css">
+    <!-- Add Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Add favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><path d=%22M50 15c-15 0-25 10-25 25v25l-10 10h70l-10-10V40c0-15-10-25-25-25z%22 fill=%22%236200ea%22/><path d=%22M50 85c5.5 0 10-4.5 10-10H40c0 5.5 4.5 10 10 10z%22 fill=%22%236200ea%22/><path d=%22M50 15c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z%22 fill=%22%236200ea%22/></svg>">
+    <!-- Add theme color for mobile browsers -->
+    <meta name="theme-color" content="#6200ea">
+</head>
+<body>
+    <div class="container">
+        <h2><span id="greeting-text">Good evening</span><span id="user-name" class="clickable-name"></span></h2>
+        <div class="schedule">
+            <div class="schedule-content">
+                <div class="header">
+                    <h3><span id="schedule-status"></span><span id="selected-day"></span></h3>
+                    <div class="controls">
+                        <select id="day-selector">
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                        </select>
+                        <button class="settings-btn global" onclick="toggleSettingsModal()" aria-label="Settings">
+                            <span class="material-icons">settings</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="countdown">Next period in: --:--</div>
+                <div id="schedule-list"></div>
+                <div id="notepad" class="notepad" style="display: none;">
+                    <div class="notepad-header">
+                        <h3>Notes</h3>
+                        <div class="formatting-tools">
+                            <button onclick="formatText('bold')" title="Bold" class="format-btn">B</button>
+                            <button onclick="formatText('italic')" title="Italic" class="format-btn">I</button>
+                            <button onclick="formatText('underline')" title="Underline" class="format-btn">U</button>
+                            <select onchange="formatText('size', this.value)" title="Text Size">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Normal</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="notes-content" class="notes-content" contenteditable="true" placeholder="Type your notes here..."></div>
+                </div>
+            </div>
+            <div class="schedule-gap"></div>
+            <div class="sidebar">
+                <div id="quick-links" class="quick-links" style="display: none">
+                    <h3 class="quick-links-title">Quick Links</h3>
+                    <div class="quick-links-list"></div>
+                </div>
+                <div id="quote-of-day" class="quote-of-day" style="display: none">
+                    <h3 class="quote-title">Quote of the Day</h3>
+                    <div class="quote-content">
+                        <p id="quote-text"></p>
+                        <p id="quote-author"></p>
+                    </div>
+                    <button class="refresh-quote" onclick="fetchQuote(true)" title="Get new quote">
+                        <span class="material-icons">refresh</span>
+                    </button>
+                </div>
+                <div id="pomodoro" class="pomodoro" style="display: none">
+                    <h3 class="pomodoro-title">Study Timer</h3>
+                    <div class="timer-display">25:00</div>
+                    <div class="timer-controls">
+                        <button class="timer-btn" onclick="setTimerMode('pomodoro')" id="pomodoro-btn">Focus</button>
+                        <button class="timer-btn" onclick="setTimerMode('break')" id="break-btn">Break</button>
+                        <button class="timer-btn" id="timer-toggle" onclick="toggleTimer()">Start</button>
+                        <button class="timer-btn stop-btn" id="timer-stop" onclick="stopTimer()">Stop</button>
+                    </div>
+                </div>
+                <div id="exam-tracker" class="exam-tracker" style="display: none">
+                    <h3 class="exam-tracker-title">Exam Tracker</h3>
+                    <div class="exam-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="avg-score">--</div>
+                            <div class="stat-label">Average</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-exams">0</div>
+                            <div class="stat-label">Exams</div>
+                        </div>
+                    </div>
+                    <div class="exam-controls">
+                        <button class="exam-btn" onclick="openExamModal()">Add Exam</button>
+                        <button class="exam-btn" onclick="viewExamStats()">View Stats</button>
+                    </div>
+                    <div class="recent-exams" id="recent-exams">
+                        <h4>Recent Exams</h4>
+                        <div class="exam-list" id="exam-list">
+                            <p class="no-exams">No exams added yet</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bell-times-card" data-tile-type="bell-times">
+                    <!-- Bell times content -->
+                </div>
+                <div class="quote-card" data-tile-type="quote">
+                    <!-- Quote content -->
+                </div>
+                <div class="weather-card" data-tile-type="weather">
+                    <!-- Weather content -->
+                </div>
+            </div>
+        </div>
+
+        <div id="ads-container" class="ads-container" style="display: none;">
+            <h3>Advertisement</h3>
+            <div id="ad-slot-1" class="ad-slot"></div>
+        </div>
+        
+        <div class="timetable-upload">
+            <h3>Import Timetable 
+                <span class="material-icons help-icon">help</span>
+                <div class="help-tooltip">
+                    <h4>How to Upload Your Timetable:</h4>
+                    <ol>
+                        <li>Navigate to the "My Timetable" section in your Sentral dashboard</li>
+                        <li>Look for the "Export as iCal" button in the top-right corner and click it to download your timetable</li>
+                        <li>Use the "Import Timetable" button below to upload the downloaded file</li>
+                        <li>Your personalized class schedule will now appear in the bell times display!</li>
+                    </ol>
+                </div>
+            </h3>
+            <div class="upload-container">
+                <input type="file" id="timetableupload" accept=".ics" />
+                <button onclick="document.getElementById('timetableupload').click()" class="upload-btn">Choose ICS File</button>
+                <button onclick="clearTimetableStorage()" class="clear-btn">Clear Timetable</button>
+            </div>
+            <p id="uploadstatus">Status: Ready to accept timetable upload...</p>
+        </div>
+    </div>
+    <footer>
+        <div class="footer-content">
+            <a href="mailto:aryashaarav@icloud.com">Made with love by Shaarav4795</a>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+    <script src="quotes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content settings-modal-modern">
+            <button class="close-btn" aria-label="Close" style="position: absolute; top: 0.7rem; right: 1.5rem; background: none; border: none; font-size: 1.7rem; color: var(--primary-color, #6200ea); cursor: pointer; opacity: 0.85; z-index: 2;" onclick="document.getElementById('settings-modal').style.display = 'none'; event.stopPropagation();">
+                <span class="material-icons">close</span>
+            </button>
+            <div class="settings-layout">
+                <nav class="settings-sidebar">
+                    <button class="settings-nav-btn active" data-tab="timetable" aria-label="Timetable"><span class="material-icons">calendar_month</span>Timetable</button>
+                    <button class="settings-nav-btn" data-tab="themes" aria-label="Themes"><span class="material-icons">palette</span>Themes</button>
+                    <button class="settings-nav-btn" data-tab="tiles" aria-label="Tiles"><span class="material-icons">view_module</span>Tiles</button>
+                    <button class="settings-nav-btn" data-tab="ads" aria-label="Ads"><span class="material-icons">monetization_on</span>Ads</button>
+                    <button class="settings-nav-btn" data-tab="more" aria-label="More"><span class="material-icons">person</span>More</button>
+                    <button class="settings-nav-btn" data-tab="reset" aria-label="Reset"><span class="material-icons">restart_alt</span>Reset</button>
+                    <button class="settings-nav-btn" data-tab="extension" aria-label="Extension"><span class="material-icons">extension</span>Extension</button>
+                </nav>
+                <div class="settings-content">
+                    <div id="timetable-tab" class="tab-content active">
+                        <h3><span class="material-icons">calendar_month</span> Timetable</h3>
+                        <p class="settings-desc">Import or clear your school timetable.</p>
+                        <div class="modal-buttons">
+                            <input type="file" id="timetableupload" accept=".ics" />
+                            <button onclick="document.getElementById('timetableupload').click()" class="upload-btn">Import Timetable</button>
+                            <button onclick="clearTimetableStorage()" class="clear-btn">Clear Timetable</button>
+                        </div>
+                    </div>
+                    <div id="themes-tab" class="tab-content">
+                        <h3><span class="material-icons">palette</span> Themes</h3>
+                        <p class="settings-desc">Choose a static or dynamic theme to personalise your experience.</p>
+                        <div class="theme-presets">
+                            <h4>Static Themes</h4>
+                            <div class="theme-grid">
+                                <button onclick="setTheme('default')" class="theme-btn default-theme"><span class="theme-preview"></span>Default</button>
+                                <button onclick="setTheme('dark')" class="theme-btn dark-theme"><span class="theme-preview"></span>Dark</button>
+                                <button onclick="setTheme('light')" class="theme-btn light-theme"><span class="theme-preview"></span>Light</button>
+                                <button onclick="setTheme('purple')" class="theme-btn purple-theme"><span class="theme-preview"></span>Purple</button>
+                                <button onclick="setTheme('green')" class="theme-btn green-theme"><span class="theme-preview"></span>Green</button>
+                                <button onclick="setTheme('ocean')" class="theme-btn ocean-theme"><span class="theme-preview"></span>Ocean</button>
+                                <button onclick="setTheme('sunset')" class="theme-btn sunset-theme"><span class="theme-preview"></span>Sunset</button>
+                                <button onclick="setTheme('minimal')" class="theme-btn minimal-theme"><span class="theme-preview"></span>Minimal</button>
+                                <button onclick="setTheme('retro')" class="theme-btn retro-theme"><span class="theme-preview"></span>Retro</button>
+                                <button onclick="setTheme('forest')" class="theme-btn forest-theme"><span class="theme-preview"></span>Forest</button>
+                                <button onclick="setTheme('candy')" class="theme-btn candy-theme"><span class="theme-preview"></span>Candy</button>
+                                <button onclick="setTheme('coffee')" class="theme-btn coffee-theme"><span class="theme-preview"></span>Coffee</button>
+                                <button onclick="setTheme('mint')" class="theme-btn mint-theme"><span class="theme-preview"></span>Mint</button>
+                                <button onclick="setTheme('coral')" class="theme-btn coral-theme"><span class="theme-preview"></span>Coral</button>
+                                <button onclick="setTheme('lavender')" class="theme-btn lavender-theme"><span class="theme-preview"></span>Lavender</button>
+                            </div>
+                            <h4>Dynamic Themes</h4>
+                            <div class="theme-grid">
+                                <button onclick="setTheme('dynamic-time')" class="theme-btn dynamic-time-theme"><span class="theme-preview"></span>Time Based</button>
+                                <button onclick="setTheme('dynamic-season')" class="theme-btn dynamic-season-theme"><span class="theme-preview"></span>Seasonal</button>
+                                <button onclick="setTheme('dynamic-study')" class="theme-btn dynamic-study-theme"><span class="theme-preview"></span>Study Focus</button>
+                                <button onclick="setTheme('dynamic-energy')" class="theme-btn dynamic-energy-theme"><span class="theme-preview"></span>Energy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tiles-tab" class="tab-content">
+                        <h3><span class="material-icons">view_module</span> Tiles</h3>
+                        <p class="settings-desc">Toggle and manage dashboard tiles.</p>
+                        <div class="tiles-options">
+                            <div class="tile-toggle">
+                                <label><input type="checkbox" id="notepad-toggle" onchange="toggleNotepad()"> Notepad</label>
+                                <button onclick="clearNotes()" class="clear-notes-btn">Clear Notes</button>
+                            </div>
+                            <div class="tile-toggle">
+                                <label><input type="checkbox" id="quick-links-toggle" onchange="toggleQuickLinks()"> Quick Links</label>
+                                <button onclick="editQuickLinks()" class="settings-btn">Edit Links</button>
+                            </div>
+                            <div class="tile-toggle">
+                                <label><input type="checkbox" id="pomodoro-toggle" onchange="togglePomodoro()"> Study Timer</label>
+                            </div>
+                            <div class="tile-toggle">
+                                <label><input type="checkbox" id="quote-toggle" onchange="toggleQuote()"> Quote of the Day</label>
+                            </div>
+                            <div class="tile-toggle">
+                                <label><input type="checkbox" id="exam-tracker-toggle" onchange="toggleExamTracker()"> Exam Tracker</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ads-tab" class="tab-content">
+                        <h3><span class="material-icons">monetization_on</span> Ads</h3>
+                        <p class="settings-desc">Your support helps keep this site running. Please consider keeping ads enabled!</p>
+                        <div class="tile-toggle">
+                            <label><input type="checkbox" id="ads-toggle" onchange="toggleAds(this.checked)"> Enable Ads</label>
+                        </div>
+                    </div>
+                    <div id="more-tab" class="tab-content">
+                        <h3><span class="material-icons">person</span> More</h3>
+                        <p class="settings-desc">Edit your name and countdown display.</p>
+                        <div class="name-settings">
+                            <h4>Your Name</h4>
+                            <div class="name-edit">
+                                <input type="text" id="name-input" placeholder="Enter your name">
+                                <button onclick="updateName()" class="settings-btn">Update Name</button>
+                            </div>
+                        </div>
+                        <div class="countdown-settings">
+                            <h4>Countdown Display</h4>
+                            <div class="countdown-options">
+                                <label><input type="checkbox" id="show-room" checked onchange="updateCountdownPreferences()"> Show Room Number</label>
+                                <label><input type="checkbox" id="show-subject" checked onchange="updateCountdownPreferences()"> Show Subject Name</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="reset-tab" class="tab-content">
+                        <h3><span class="material-icons">restart_alt</span> Reset</h3>
+                        <p class="settings-desc">Reset all settings to their default values. This will clear your name, preferences, quick links, notes, and theme.</p>
+                        <div class="reset-settings">
+                            <button onclick="resetAllSettings()" class="reset-btn">Reset All Settings</button>
+                        </div>
+                    </div>
+                    <div id="extension-tab" class="tab-content">
+                        <h3><span class="material-icons">extension</span> Chrome Extension</h3>
+                        <p class="settings-desc">Get the Baulko Bell Times Chrome extension for quick access from your browser!</p>
+                        <div class="extension-info">
+                            <div class="extension-steps">
+                                <h5>Installation Instructions:</h5>
+                                <ol>
+                                    <li>Open <a href="https://drive.google.com/drive/folders/1aljeqUz_4ZmBM-dFm2YXBnHlQTfAyUDG" target="_blank" class="extension-link">this Google Drive link</a></li>
+                                    <li>Select All</li>
+                                    <li>Press the 'Download' button</li>
+                                    <li>Extract the downloaded ZIP file</li>
+                                    <li>Open <code>chrome://extensions</code> in your browser</li>
+                                    <li>Enable "Developer mode" using the toggle in the top-right</li>
+                                    <li>Click "Load unpacked" and select the extracted folder (not individual files)</li>
+                                    <li>Enjoy your new extension!</li>
+                                </ol>
+                            </div>
+                            <div class="extension-note">
+                                <p><strong>Note:</strong> The extension provides quick access to bell times directly from your Chrome toolbar.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exam Modal -->
+    <div id="exam-modal" class="modal">
+        <div class="modal-content exam-modal" style="font-family: 'Montserrat', 'Open Sans', sans-serif; max-width: 650px; width: 98%; font-size: 1.08rem;">
+            <div class="modal-header">
+                <h3>Add New Exam</h3>
+                <button class="close-btn" onclick="closeExamModal()">&times;</button>
+            </div>
+            <div class="exam-form">
+                <div class="form-group">
+                    <label for="exam-subject">Subject</label>
+                    <input type="text" id="exam-subject" placeholder="e.g., Mathematics" required>
+                </div>
+                <div class="form-group">
+                    <label for="exam-title">Exam Title</label>
+                    <input type="text" id="exam-title" placeholder="e.g., Mid-term Exam" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="exam-score">Score</label>
+                        <input type="number" id="exam-score" min="0" max="100" placeholder="85" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exam-max-score">Max Score</label>
+                        <input type="number" id="exam-max-score" min="1" value="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exam-weight">Weight (%)</label>
+                        <input type="number" id="exam-weight" min="1" max="100" value="100" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="exam-date">Date</label>
+                    <input type="date" id="exam-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="exam-notes">Notes (Optional)</label>
+                    <textarea id="exam-notes" placeholder="Any additional notes about the exam..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button onclick="saveExam()" class="upload-btn">Save Exam</button>
+                    <button onclick="closeExamModal()" class="clear-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exam Stats Modal -->
+    <div id="exam-stats-modal" class="modal">
+        <div class="modal-content exam-stats-modal" style="font-family: 'Montserrat', 'Open Sans', sans-serif; max-width: 1000px; width: 98%; font-size: 1.08rem;">
+            <div class="modal-header">
+                <h3>Exam Statistics</h3>
+                <button class="close-btn" onclick="closeExamStatsModal()">&times;</button>
+            </div>
+            <div class="stats-content">
+                <div class="stats-overview">
+                    <div class="stat-item">
+                        <div class="stat-number" id="stats-avg-score">--</div>
+                        <div class="stat-description">Average Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="stats-total-exams">0</div>
+                        <div class="stat-description">Total Exams</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="stats-highest-score">--</div>
+                        <div class="stat-description">Highest Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="stats-lowest-score">--</div>
+                        <div class="stat-description">Lowest Score</div>
+                    </div>
+                </div>
+                <div class="subject-breakdown">
+                    <h4>Performance by Subject</h4>
+                    <div id="subject-stats" class="subject-stats">
+                        <!-- Subject stats will be populated here -->
+                    </div>
+                </div>
+                <div class="subject-averages-dashboard" id="subject-averages-dashboard">
+                    <h4>Average Scores by Subject</h4>
+                    <div id="subject-averages-cards" class="subject-averages-cards"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subject Analytics Modal -->
+    <div id="subject-analytics-modal" class="modal">
+        <div class="modal-content subject-analytics-modal" style="font-family: 'Montserrat', 'Open Sans', sans-serif; max-width: 1000px; width: 98%; font-size: 1.08rem;">
+            <div class="modal-header">
+                <h3 id="subject-analytics-title">Subject Analytics</h3>
+                <button class="close-btn" onclick="closeSubjectAnalyticsModal()">&times;</button>
+            </div>
+            <div class="subject-analytics-content">
+                <div class="subject-analytics-stats" id="subject-analytics-stats"></div>
+                <div class="subject-analytics-graph" id="subject-analytics-graph" style="margin: 1.5rem 0;"></div>
+                <div class="subject-analytics-list" id="subject-analytics-list"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
