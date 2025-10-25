@@ -111,105 +111,7 @@ const TIMER_MODES = {
     break: 5 * 60      // 5 minutes in seconds
 };
 
-// ==============================================
-// ADS CONFIGURATION
-// ==============================================
 
-function initializeAds() {
-    // Ads are disabled by default unless explicitly enabled
-    const adsEnabled = localStorage.getItem('adsEnabled') === 'true';
-    const adsToggle = document.getElementById('ads-toggle');
-    const adsContainer = document.getElementById('ads-container');
-    
-    if (adsToggle) {
-        adsToggle.checked = adsEnabled;
-    }
-    
-    if (adsContainer) {
-        adsContainer.style.display = adsEnabled ? 'block' : 'none';
-    }
-
-    // If ads are disabled, don't do anything else
-    if (!adsEnabled) {
-        return;
-    }
-
-    // If enabled, check if the script already exists to prevent duplicates
-    if (!document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
-        const adScript = document.createElement('script');
-        adScript.async = true;
-        adScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6495491558279009";
-        adScript.crossOrigin = "anonymous";
-        document.head.appendChild(adScript);
-    }
-    
-    // Load ad slot if container exists
-    if (adsContainer) {
-        adsContainer.style.display = 'block';
-        loadAdSlot();
-    }
-}
-
-function loadAdSlot() {
-    const adSlotElement = document.getElementById('ad-slot-1');
-    if (adSlotElement) {
-        // Placeholder for ad content - in a real implementation, this would be an actual ad slot
-        adSlotElement.innerHTML = '<p>Advertisement Space</p>';
-        
-        // In a real implementation, you would add the actual ad code here
-        // For example:
-        // adSlotElement.innerHTML = `
-        //     <ins class="adsbygoogle"
-        //          style="display:block"
-        //          data-ad-client="ca-pub-6495491558279009"
-        //          data-ad-slot="YOUR_AD_SLOT_ID"
-        //          data-ad-format="auto"
-        //          data-full-width-responsive="true"></ins>
-        // `;
-        
-        // If adsbygoogle script is loaded, request an ad
-        if (typeof window.adsbygoogle !== 'undefined') {
-            try {
-                (window.adsbygoogle = window.adsbygoogle || []).push({});
-            } catch (e) {
-                console.log('Ads not loaded:', e);
-            }
-        }
-    }
-}
-
-function toggleAds(isEnabled) {
-    localStorage.setItem('adsEnabled', isEnabled);
-    
-    // Show/hide the ads container immediately
-    const adsContainer = document.getElementById('ads-container');
-    if (adsContainer) {
-        adsContainer.style.display = isEnabled ? 'block' : 'none';
-    }
-    
-    // If enabling ads, load the ad script if not already loaded
-    if (isEnabled) {
-        // Check if the script is already loaded to prevent duplicates
-        if (!document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
-            const adScript = document.createElement('script');
-            adScript.async = true;
-            adScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6495491558279009";
-            adScript.crossOrigin = "anonymous";
-            document.head.appendChild(adScript);
-            
-            // Wait for script to load before attempting to display ads
-            adScript.onload = function() {
-                loadAdSlot();
-            };
-        } else {
-            // If script is already loaded, just load the ad slot
-            loadAdSlot();
-        }
-    }
-    
-    // Alert that settings have been saved
-    alert(`Advertisements are now ${isEnabled ? 'enabled' : 'disabled'}.`);
-}
 
 // ==============================================
 // APPLICATION CODE BELOW
@@ -561,7 +463,7 @@ setInterval(() => {
 
 updateGreeting(); // Initial call
 updateSchedule(); // Initial call
-initializeAds(); // Initialize ads on page load
+
 
 function initializeUser() {
     // Onboarding disabled: do not show welcome modal
@@ -1997,7 +1899,23 @@ function makeTimerEditable() {
             }
         }
         
-        timerDisplay.removeChild(input);
+        timerDisplay.removeChild(input)
+
+// Function to load the ad script
+function loadAdScript() {
+    // If the script already exists, don't add it again
+    if (document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
+        return;
+    }
+    const adScript = document.createElement('script');
+    adScript.async = true;
+    adScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6495491558279009";
+    adScript.crossOrigin = "anonymous";
+    document.head.appendChild(adScript);
+}
+
+// Load the ad script when the page loads
+window.addEventListener('load', loadAdScript);;
         updateTimerDisplay(timeLeft);
     }
     
