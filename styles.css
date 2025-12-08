@@ -3189,25 +3189,5 @@ button,
   }
 }
 
-.ads-container {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    border-radius: 12px;
-    background: var(--card-background);
-    border: 1.5px solid var(--border-color);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    font-family: 'Montserrat', 'Open Sans', sans-serif;
-}
-
-.ad-slot {
-    min-height: 100px;
-    border: 1px dashed #ccc;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #888;
-    font-style: italic;
-    background-color: rgba(0, 0, 0, 0.03);
-}
+/* Ad styling removed (no longer in use) */
 

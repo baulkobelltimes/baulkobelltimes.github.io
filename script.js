@@ -1901,21 +1901,7 @@ function makeTimerEditable() {
         
         timerDisplay.removeChild(input)
 
-// Function to load the ad script
-function loadAdScript() {
-    // If the script already exists, don't add it again
-    if (document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
-        return;
-    }
-    const adScript = document.createElement('script');
-    adScript.async = true;
-    adScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6495491558279009";
-    adScript.crossOrigin = "anonymous";
-    document.head.appendChild(adScript);
-}
-
-// Load the ad script when the page loads
-window.addEventListener('load', loadAdScript);;
+// Ads removed: ad-loading code stripped since the site no longer serves ads
         updateTimerDisplay(timeLeft);
     }
     
