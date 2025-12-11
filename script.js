@@ -272,6 +272,15 @@ function formatTime(date) {
     });
 }
 
+// Extract a timetable key from a bell label (e.g. "Period 3" -> "3", "Roll Call" -> "0")
+function getPeriodKey(periodName) {
+    if (!periodName) return null;
+    const periodMatch = periodName.match(/Period\s+(\d+)/i);
+    if (periodMatch) return periodMatch[1];
+    if (/^roll\s*call/i.test(periodName)) return '0';
+    return null;
+}
+
 // Helper function to get next period
 function getNextPeriod(day) {
     if (!bellTimes[day]) return null;
@@ -371,9 +380,9 @@ function updateCountdown() {
         if (userTimetable) {
             const timetableData = JSON.parse(userTimetable)[currentDay];
             if (timetableData) {
-                let periodNum = nextPeriod.name.split(' ')[1];
-                if (periodNum && timetableData[periodNum]) {
-                    const [subject, room] = timetableData[periodNum];
+                const periodKey = getPeriodKey(nextPeriod.name);
+                if (periodKey && timetableData[periodKey]) {
+                    const [subject, room] = timetableData[periodKey];
                     const details = [];
                     
                     if (showSubject && subject) details.push(subject);
