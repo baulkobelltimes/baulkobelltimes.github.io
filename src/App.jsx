@@ -8,8 +8,18 @@ import { SettingsModal, AddExamModal, EditExamModal, ViewStatsModal } from './co
 import { ThemeProvider } from './hooks/useTheme';
 import useTime from './hooks/useTime';
 import useLocalStorage from './hooks/useLocalStorage';
-import { BELL_TIMES, SCHOOL_NAME, DEFAULT_QUICK_LINKS } from './config/constants';
+import { BELL_TIMES, SCHOOL_NAME, DEFAULT_QUICK_LINKS, APP_STORAGE_VERSION } from './config/constants';
 import { parseTimetable } from './utils/timetableParser';
+
+const STORAGE_VERSION_KEY = 'bbt_storage_version';
+
+if (typeof window !== 'undefined') {
+  const storedVersion = window.localStorage.getItem(STORAGE_VERSION_KEY);
+  if (storedVersion !== APP_STORAGE_VERSION) {
+    window.localStorage.clear();
+    window.localStorage.setItem(STORAGE_VERSION_KEY, APP_STORAGE_VERSION);
+  }
+}
 
 function AppContent() {
   const { currentDay, greeting, isSchoolDay, getCountdownInfo } = useTime();
@@ -65,7 +75,8 @@ function AppContent() {
   }, [getCountdownInfo, currentDay, timetableData, isSchoolDay]);
 
   useEffect(() => {
-    document.title = `${countdownTitle} - ${SCHOOL_NAME} Bell Times`;
+    const baseTitle = `${SCHOOL_NAME} Bell Times`;
+    document.title = countdownTitle === SCHOOL_NAME ? baseTitle : `${countdownTitle} - ${baseTitle}`;
   }, [countdownTitle]);
 
   const hasSidebar = useMemo(() => {
