@@ -280,20 +280,18 @@ const SettingsModal = ({
                   <li>
                     Open{' '}
                     <a 
-                      href="https://drive.google.com/drive/folders/1aljeqUz_4ZmBM-dFm2YXBnHlQTfAyUDG" 
+                      href="https://github.com/baulkobelltimes/baulkobelltimes.github.io/releases"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="extension-link"
                     >
-                      this Google Drive link
+                      the releases page
                     </a>
                   </li>
-                  <li>Select All</li>
-                  <li>Press the 'Download' button</li>
-                  <li>Extract the downloaded ZIP file</li>
-                  <li>Open <code>chrome://extensions</code> in your browser</li>
-                  <li>Enable "Developer mode" using the toggle in the top-right</li>
-                  <li>Click "Load unpacked" and select the extracted folder</li>
+                  <li>Download the latest release ZIP (the one that says dist.zip)</li>
+                  <li>Unzip it to a new folder</li>
+                  <li>Open <code>chrome://extensions</code> and enable Developer mode</li>
+                  <li>Click "Load unpacked" and select the new dist folder</li>
                   <li>Enjoy your new extension!</li>
                 </ol>
               </div>
