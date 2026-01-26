@@ -1,0 +1,126 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
+  max-width: 1200px;
+  width: 95%;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.greeting {
+  text-align: center;
+  color: var(--primary-color);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.greeting-name {
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+  font-weight: 700;
+}
+
+.greeting-name:hover {
+  opacity: 0.8;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(auto, 800px);
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: start;
+}
+
+.layout.with-sidebar {
+  grid-template-columns: minmax(auto, 800px) 320px;
+  align-items: start;
+}
+
+.schedule-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .layout.with-sidebar {
+    grid-template-columns: 1fr;
+  }
+}
+
+.footer {
+  padding: 1rem;
+  text-align: center;
+  margin-top: auto;
+  background: linear-gradient(to right,
+    rgba(var(--primary-rgb), 0.05),
+    rgba(var(--primary-rgb), 0.1),
+    rgba(var(--primary-rgb), 0.05));
+  border-top: 1px solid rgba(var(--primary-rgb), 0.1);
+}
+
+.footer a {
+  color: var(--primary-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.footer a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* Notification Toast */
+.notification-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 500;
+  z-index: 10000;
+  animation: slideDown 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.notification-toast.success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.notification-toast.error {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
