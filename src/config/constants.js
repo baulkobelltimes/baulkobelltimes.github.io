@@ -7,11 +7,9 @@ export const SCHOOL_NAME = "Baulko";
 export const APP_STORAGE_VERSION = "2026-01-26";
 
 export const DEFAULT_QUICK_LINKS = [
-  { title: 'Moodle', url: 'http://web1.baulkham-h.schools.nsw.edu.au' },
   { title: 'Sentral', url: 'https://baulkham-h.sentral.com.au' },
   { title: 'Classroom', url: 'https://classroom.google.com' },
-  { title: 'Study Music', url: 'https://anycircle11139s.github.io/Music/' },
-  { title: 'To-Do List', url: 'https://thetodolist.github.io' }
+  { title: 'To-Do List', url: 'https://app.super-productivity.com' }
 ];
 
 export const BELL_TIMES = {
