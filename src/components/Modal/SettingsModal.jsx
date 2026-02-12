@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import { 
   Calendar, 
   Palette, 
@@ -25,7 +25,6 @@ const TABS = [
 
 const STATIC_THEMES = [
   { id: 'default', label: 'Default', color: '#6200ea' },
-  { id: 'dark', label: 'Dark', color: '#bb86fc' },
   { id: 'light', label: 'Light', color: '#1976d2' },
   { id: 'purple', label: 'Purple', color: '#9c27b0' },
   { id: 'green', label: 'Green', color: '#2e7d32' },
@@ -58,7 +57,7 @@ const SettingsModal = ({
   const [activeTab, setActiveTab] = useState('timetable');
   const [nameInput, setNameInput] = useState(userName || '');
   const fileInputRef = useRef(null);
-  const { themeName, setTheme } = useTheme();
+  const { themeName, themeMode, setTheme } = useTheme();
 
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
@@ -124,17 +123,47 @@ const SettingsModal = ({
               <h4>Themes</h4>
               <div className="theme-grid">
                 {STATIC_THEMES.map(theme => (
-                  <button
+                  <div
                     key={theme.id}
-                    className={`theme-btn ${themeName === theme.id ? 'active' : ''}`}
-                    onClick={() => setTheme(theme.id)}
+                    className={`theme-card ${themeName === theme.id ? 'active' : ''}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={themeName === theme.id}
+                    onClick={() => setTheme(theme.id, themeMode)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setTheme(theme.id, themeMode);
+                      }
+                    }}
                   >
-                    <span 
-                      className="theme-preview"
-                      style={{ background: theme.color }}
-                    />
-                    {theme.label}
-                  </button>
+                    <span className="theme-preview" style={{ background: theme.color }} />
+                    <span className="theme-label">{theme.label}</span>
+                    <div className="theme-variants" role="group" aria-label={`${theme.label} mode`}>
+                      <button
+                        type="button"
+                        className={`theme-variant-btn ${themeName === theme.id && themeMode === 'light' ? 'active' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTheme(theme.id, 'light');
+                        }}
+                        aria-label={`Set ${theme.label} to light mode`}
+                      >
+                        <span className="material-symbols-outlined" aria-hidden="true">light_mode</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={`theme-variant-btn ${themeName === theme.id && themeMode === 'dark' ? 'active' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTheme(theme.id, 'dark');
+                        }}
+                        aria-label={`Set ${theme.label} to dark mode`}
+                      >
+                        <span className="material-symbols-outlined" aria-hidden="true">dark_mode</span>
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

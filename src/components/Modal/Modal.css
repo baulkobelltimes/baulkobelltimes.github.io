@@ -41,6 +41,12 @@
   opacity: 1;
 }
 
+/* Override Button ghost hover so close button stays solid */
+.modal-close.btn-ghost:hover {
+  background: var(--card-background);
+  color: var(--primary-color);
+}
+
 /* Settings Modal Specific */
 .settings-modal {
   display: flex;
@@ -181,7 +187,7 @@
   gap: 0.75rem;
 }
 
-.theme-btn {
+.theme-card {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -192,16 +198,59 @@
   transition: all var(--transition-smooth);
   font-size: 0.8rem;
   font-weight: 500;
+  color: var(--text-color);
+  user-select: none;
+  cursor: pointer;
 }
 
-.theme-btn:hover {
+.theme-card:hover {
   border-color: var(--primary-color);
   transform: translateY(-2px);
 }
 
-.theme-btn.active {
+.theme-card:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.theme-card.active {
   border-color: var(--primary-color);
   background: rgba(var(--primary-rgb), 0.1);
+}
+
+.theme-label {
+  line-height: 1.1;
+  text-align: center;
+}
+
+.theme-variants {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.theme-variant-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--background-color);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-smooth);
+}
+
+.theme-variant-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.theme-variant-btn.active {
+  border-color: var(--primary-color);
+  background: rgba(var(--primary-rgb), 0.15);
+  color: var(--primary-color);
 }
 
 .theme-preview {

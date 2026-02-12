@@ -78,6 +78,15 @@ button {
   background: none;
 }
 
+.material-symbols-outlined {
+  font-size: 20px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+}
+
 input, select, textarea {
   font-family: inherit;
   font-size: inherit;
@@ -121,6 +130,30 @@ a {
 
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Ensure secondary text is readable in all themes */
+.settings-desc {
+  color: var(--text-color) !important;
+  opacity: 0.85 !important;
+}
+
+.countdown-details {
+  opacity: 0.95 !important;
+  color: var(--text-color) !important;
+}
+
+.period-time {
+  color: var(--text-color) !important;
+  opacity: 1 !important;
+}
+
+.time-label {
+  color: var(--text-color) !important;
+}
+
+.greeting-name {
+  opacity: 1 !important;
 }
 
 .canvas-container {
