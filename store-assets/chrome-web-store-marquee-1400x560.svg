@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="560" viewBox="0 0 1400 560" role="img" aria-label="Baulko Bell Times marquee promo tile">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#edf6ff"/>
+      <stop offset="100%" stop-color="#f7efff"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1300 42) rotate(145) scale(640 430)">
+      <stop offset="0%" stop-color="#93c5fd" stop-opacity="0.56"/>
+      <stop offset="100%" stop-color="#93c5fd" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(72 562) rotate(-28) scale(680 420)">
+      <stop offset="0%" stop-color="#c4b5fd" stop-opacity="0.46"/>
+      <stop offset="100%" stop-color="#c4b5fd" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="tileShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#1f2a44" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <rect width="1400" height="560" rx="40" fill="url(#bg)"/>
+  <rect width="1400" height="560" rx="40" fill="url(#glowA)"/>
+  <rect width="1400" height="560" rx="40" fill="url(#glowB)"/>
+  <rect x="1.5" y="1.5" width="1397" height="557" rx="38.5" fill="none" stroke="#ffffff" stroke-opacity="0.6"/>
+
+  <rect x="84" y="92" width="332" height="376" rx="58" fill="#ffffff" fill-opacity="0.94" filter="url(#tileShadow)"/>
+  <rect x="108" y="116" width="284" height="328" rx="38" fill="#f7f9ff" stroke="#dbe5ff"/>
+
+  <g transform="translate(136 142) scale(2.76)">
+    <path d="M50 15c-15 0-25 10-25 25v25l-10 10h70l-10-10V40c0-15-10-25-25-25z" fill="#6d28d9"/>
+    <path d="M50 85c5.5 0 10-4.5 10-10H40c0 5.5 4.5 10 10 10z" fill="#6d28d9"/>
+    <path d="M50 15c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z" fill="#6d28d9"/>
+  </g>
+
+  <rect x="474" y="108" width="214" height="42" rx="21" fill="#dfeaff"/>
+  <text x="581" y="136" text-anchor="middle" fill="#2856c5" font-size="20" font-weight="700" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif">Chrome extension</text>
+
+  <text x="474" y="236" fill="#12182d" font-size="88" font-weight="820" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif">Baulko</text>
+  <text x="474" y="324" fill="#12182d" font-size="88" font-weight="820" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif">Bell Times</text>
+
+  <text x="474" y="388" fill="#32405a" font-size="34" font-weight="650" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif">Live bell countdowns with your imported</text>
+  <text x="474" y="430" fill="#32405a" font-size="34" font-weight="650" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif">school timetable in one clean popup.</text>
+
+  <rect x="474" y="466" width="176" height="42" rx="21" fill="#ffffff" fill-opacity="0.88" stroke="#d8e2ff"/>
+  <rect x="668" y="466" width="156" height="42" rx="21" fill="#ffffff" fill-opacity="0.88" stroke="#d8e2ff"/>
+  <rect x="842" y="466" width="192" height="42" rx="21" fill="#ffffff" fill-opacity="0.88" stroke="#d8e2ff"/>
+  <rect x="1052" y="466" width="168" height="42" rx="21" fill="url(#accent)"/>
+
+  <text x="562" y="493" text-anchor="middle" fill="#344160" font-size="18" font-weight="700" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif">Countdowns</text>
+  <text x="746" y="493" text-anchor="middle" fill="#344160" font-size="18" font-weight="700" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif">ICS import</text>
+  <text x="938" y="493" text-anchor="middle" fill="#344160" font-size="18" font-weight="700" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif">Current + next period</text>
+  <text x="1136" y="493" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="700" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif">Fast popup</text>
+</svg>

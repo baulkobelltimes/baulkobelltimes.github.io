@@ -48,18 +48,3 @@ This command:
 4. Creates a versioned ZIP in `artifacts/`.
 
 Important release rule: Chrome Web Store versions must be numeric only, with 1 to 4 dot-separated numbers, for example `1.0.0` or `1.2.3.4`.
-
-## Publish To Chrome Web Store
-
-The full checklist lives in [docs/chrome-web-store.md](docs/chrome-web-store.md). The short version is:
-
-1. Bump `package.json` version.
-2. Run `npm run lint`.
-3. Run `npm run release:extension`.
-4. Upload the ZIP from `artifacts/` in the Chrome Developer Dashboard.
-5. Complete the Store listing and Privacy tabs before first publish.
-
-## Repo Hygiene
-
-- `dist/`, `dist-extension/`, and `artifacts/` are generated and should stay out of git.
-- `.env` files are ignored so future publishing credentials or automation tokens do not get committed.
