@@ -48,6 +48,23 @@ function AppContent() {
     notepad: false
   });
   const [tileOrder, setTileOrder] = useLocalStorage('tileOrder', ['quickLinks', 'quote', 'timer', 'examTracker']);
+
+  // In extension mode we always hide the quick links and quote tiles.
+  // This ensures they never flash on first load before settings are applied.
+  const effectiveTiles = useMemo(() => {
+    if (!isExtensionMode) return tiles;
+    return {
+      ...tiles,
+      quickLinks: false,
+      quote: false
+    };
+  }, [isExtensionMode, tiles]);
+
+  const effectiveTileOrder = useMemo(() => {
+    if (!isExtensionMode) return tileOrder;
+    return tileOrder.filter((tile) => tile !== 'quickLinks' && tile !== 'quote');
+  }, [isExtensionMode, tileOrder]);
+
   const [showRoom, setShowRoom] = useLocalStorage('showRoom', true);
   const [showSubject, setShowSubject] = useLocalStorage('showSubject', true);
   const [quickLinks, setQuickLinks] = useLocalStorage('quickLinks', DEFAULT_QUICK_LINKS);
@@ -88,8 +105,8 @@ function AppContent() {
   }, [countdownTitle]);
 
   const hasSidebar = useMemo(() => {
-    return tiles.quickLinks || tiles.quote || tiles.timer || tiles.examTracker;
-  }, [tiles]);
+    return effectiveTiles.quickLinks || effectiveTiles.quote || effectiveTiles.timer || effectiveTiles.examTracker;
+  }, [effectiveTiles]);
 
   // Notification animation
   useEffect(() => {
@@ -219,12 +236,12 @@ function AppContent() {
           </div>
 
           <Sidebar
-            showQuickLinks={tiles.quickLinks}
-            showQuote={tiles.quote}
-            showTimer={tiles.timer}
-            showExamTracker={tiles.examTracker}
+            showQuickLinks={effectiveTiles.quickLinks}
+            showQuote={effectiveTiles.quote}
+            showTimer={effectiveTiles.timer}
+            showExamTracker={effectiveTiles.examTracker}
             quickLinks={quickLinks}
-            tileOrder={tileOrder}
+            tileOrder={effectiveTileOrder}
             onTileReorder={handleTileReorder}
             onAddExam={() => setAddExamOpen(true)}
             onViewStats={() => setViewStatsOpen(true)}
