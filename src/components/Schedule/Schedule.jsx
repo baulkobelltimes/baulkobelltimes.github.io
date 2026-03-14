@@ -16,13 +16,11 @@ const Schedule = ({
   showRoom = true,
   showSubject = true
 }) => {
-  const { 
-    now, 
-    currentDay, 
-    timeInMinutes, 
-    convertTimeToMinutes, 
-    formatTime,
-    getCountdownInfo 
+  const {
+    currentDay,
+    timeInMinutes,
+    convertTimeToMinutes,
+    getCountdownInfo
   } = useTime();
   
   const listRef = useRef(null);
@@ -57,11 +55,7 @@ const Schedule = ({
 
   const countdownInfo = useMemo(() => {
     return getCountdownInfo(currentDay, timetableData);
-  }, [currentDay, timetableData, getCountdownInfo, now]);
-
-  const isBreakPeriod = useCallback((name) => {
-    return /lunch|recess|break|sport/i.test(name || '');
-  }, []);
+  }, [currentDay, timetableData, getCountdownInfo]);
 
   const getPeriodStatus = useCallback((period, index) => {
     if (selectedDay !== currentDay) return '';

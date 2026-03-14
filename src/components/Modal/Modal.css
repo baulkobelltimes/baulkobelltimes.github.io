@@ -146,10 +146,6 @@
   min-height: 0;
 }
 
-.settings-content-inner > div > .settings-desc + .extension-info {
-  margin-top: -0.5rem;
-}
-
 .settings-content h3 {
   display: flex;
   align-items: center;

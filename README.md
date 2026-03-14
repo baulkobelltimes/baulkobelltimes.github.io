@@ -1,16 +1,32 @@
-# React + Vite
+# Baulko Bell Times
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Baulko Bell Times is a React + Vite app for viewing school bell times, managing your timetable, and using study tools.
 
-Currently, two official plugins are available:
+## Commands
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- `npm run dev`: Start the local Vite dev server.
+- `npm run build`: Build the website into `dist/`.
+- `npm run build:extension`: Build the website and package a Chrome extension into `dist-extension/`.
+- `npm run lint`: Run ESLint.
 
-## React Compiler
+## Chrome Extension Workflow
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Whenever you update the website, run:
 
-## Expanding the ESLint configuration
+```bash
+npm run build:extension
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This command automatically:
+
+1. Builds the latest website.
+2. Copies the build into `dist-extension/`.
+3. Generates `dist-extension/manifest.json`.
+4. Removes unsupported analytics script tags from the extension popup HTML.
+
+To load it in Chrome:
+
+1. Open `chrome://extensions`.
+2. Enable Developer mode.
+3. Click **Load unpacked**.
+4. Select the `dist-extension/` folder.

@@ -4,7 +4,7 @@
 
 export const SCHOOL_NAME = "Baulko";
 
-export const APP_STORAGE_VERSION = "2026-01-26";
+export const APP_STORAGE_VERSION = "2026-03-14";
 
 export const DEFAULT_QUICK_LINKS = [
   { title: 'Sentral', url: 'https://baulkham-h.sentral.com.au' },

@@ -4,13 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 127.0.0.1 --port 4173",
     "build": "vite build",
+    "build:extension": "node scripts/build-extension.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "gsap": "^3.14.2",
+    "ical.js": "^2.2.1",
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

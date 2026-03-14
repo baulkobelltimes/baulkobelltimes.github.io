@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { gsap } from 'gsap';
+import ICAL from 'ical.js';
 import './App.css';
 import Schedule from './components/Schedule';
 import Sidebar from './components/Sidebar';
@@ -8,22 +8,30 @@ import { SettingsModal, AddExamModal, EditExamModal, ViewStatsModal } from './co
 import { ThemeProvider } from './hooks/useTheme';
 import useTime from './hooks/useTime';
 import useLocalStorage from './hooks/useLocalStorage';
-import { BELL_TIMES, SCHOOL_NAME, DEFAULT_QUICK_LINKS, APP_STORAGE_VERSION } from './config/constants';
+import { SCHOOL_NAME, DEFAULT_QUICK_LINKS, APP_STORAGE_VERSION } from './config/constants';
 import { parseTimetable } from './utils/timetableParser';
 
 const STORAGE_VERSION_KEY = 'bbt_storage_version';
 
 if (typeof window !== 'undefined') {
-  const storedVersion = window.localStorage.getItem(STORAGE_VERSION_KEY);
-  if (storedVersion !== APP_STORAGE_VERSION) {
-    window.localStorage.clear();
-    window.localStorage.setItem(STORAGE_VERSION_KEY, APP_STORAGE_VERSION);
+  try {
+    const storedVersion = window.localStorage.getItem(STORAGE_VERSION_KEY);
+    if (storedVersion !== APP_STORAGE_VERSION) {
+      window.localStorage.clear();
+      window.localStorage.setItem(STORAGE_VERSION_KEY, APP_STORAGE_VERSION);
+    }
+  } catch (error) {
+    console.error('Unable to access localStorage for version migration:', error);
   }
 }
 
 function AppContent() {
   const { currentDay, greeting, isSchoolDay, getCountdownInfo } = useTime();
   const appRef = useRef(null);
+  const isExtensionMode = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.location.protocol.endsWith('extension:');
+  }, []);
   
   // State
   const [selectedDay, setSelectedDay] = useLocalStorage(
@@ -56,7 +64,7 @@ function AppContent() {
     if (isSchoolDay && currentDay !== selectedDay) {
       setSelectedDay(currentDay);
     }
-  }, [currentDay, isSchoolDay]);
+  }, [currentDay, isSchoolDay, selectedDay, setSelectedDay]);
 
   useEffect(() => {
     const validTiles = ['quickLinks', 'quote', 'timer', 'examTracker'];
@@ -98,11 +106,7 @@ function AppContent() {
   const handleTimetableUpload = useCallback(async (file) => {
     try {
       const text = await file.text();
-      // Use ICAL from CDN (loaded via script tag in index.html)
-      if (!window.ICAL) {
-        throw new Error('ICAL library not loaded');
-      }
-      const jcaldata = window.ICAL.parse(text)[2];
+      const jcaldata = ICAL.parse(text)[2];
       const data = parseTimetable(jcaldata);
       setTimetableData(data);
       setSettingsOpen(false);
@@ -119,14 +123,14 @@ function AppContent() {
     showNotification('Timetable cleared', 'success');
   }, [setTimetableData, showNotification]);
 
-  const handleTileToggle = useCallback((tile) => {
-    setTiles(prev => ({ ...prev, [tile]: !prev[tile] }));
-  }, [setTiles]);
-
   const handleCountdownPrefsUpdate = useCallback((key, value) => {
     if (key === 'showRoom') setShowRoom(value);
     if (key === 'showSubject') setShowSubject(value);
   }, [setShowRoom, setShowSubject]);
+
+  const handleTileToggle = useCallback((tile) => {
+    setTiles((prev) => ({ ...prev, [tile]: !prev[tile] }));
+  }, [setTiles]);
 
   const handleNameClick = useCallback(() => {
     const newName = prompt('Enter your name:', userName);
@@ -248,6 +252,7 @@ function AppContent() {
         showRoom={showRoom}
         showSubject={showSubject}
         onCountdownPrefsUpdate={handleCountdownPrefsUpdate}
+        isExtension={isExtensionMode}
       />
 
       <AddExamModal
@@ -257,6 +262,7 @@ function AppContent() {
       />
 
       <EditExamModal
+        key={examToEdit?.id ?? 'no-exam-selected'}
         isOpen={editExamOpen}
         onClose={handleEditExamClose}
         exam={examToEdit}

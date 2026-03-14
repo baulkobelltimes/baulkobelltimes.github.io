@@ -1,11 +1,13 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { 
   Calendar, 
   Palette, 
-  LayoutGrid, 
+  LayoutGrid,
   User, 
-  RotateCcw, 
+  RotateCcw,
   Puzzle,
+  Sun,
+  Moon,
   Upload,
   Trash2
 } from 'lucide-react';
@@ -52,12 +54,25 @@ const SettingsModal = ({
   onNameUpdate,
   showRoom,
   showSubject,
-  onCountdownPrefsUpdate
+  onCountdownPrefsUpdate,
+  isExtension = false
 }) => {
   const [activeTab, setActiveTab] = useState('timetable');
   const [nameInput, setNameInput] = useState(userName || '');
   const fileInputRef = useRef(null);
   const { themeName, themeMode, setTheme } = useTheme();
+
+  const visibleTabs = useMemo(() => {
+    if (!isExtension) {
+      return TABS;
+    }
+
+    return TABS.filter((tab) => !['tiles', 'reset', 'extension'].includes(tab.id));
+  }, [isExtension]);
+
+  const currentTab = visibleTabs.some((tab) => tab.id === activeTab)
+    ? activeTab
+    : 'timetable';
 
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
@@ -79,8 +94,8 @@ const SettingsModal = ({
     }
   };
 
-  const renderTabContent = () => {
-    switch (activeTab) {
+  const renderTabContent = (tabId) => {
+    switch (tabId) {
       case 'timetable':
         return (
           <div>
@@ -149,7 +164,7 @@ const SettingsModal = ({
                         }}
                         aria-label={`Set ${theme.label} to light mode`}
                       >
-                        <span className="material-symbols-outlined" aria-hidden="true">light_mode</span>
+                        <Sun size={18} aria-hidden="true" />
                       </button>
                       <button
                         type="button"
@@ -160,7 +175,7 @@ const SettingsModal = ({
                         }}
                         aria-label={`Set ${theme.label} to dark mode`}
                       >
-                        <span className="material-symbols-outlined" aria-hidden="true">dark_mode</span>
+                        <Moon size={18} aria-hidden="true" />
                       </button>
                     </div>
                   </div>
@@ -281,7 +296,7 @@ const SettingsModal = ({
           <div>
             <h3><RotateCcw size={24} /> Reset</h3>
             <p className="settings-desc">
-              Reset all settings to their default values. This will clear your name, 
+              Reset all settings to their default values. This will clear your name,
               preferences, quick links, notes, and theme.
             </p>
             <div className="reset-section">
@@ -308,7 +323,7 @@ const SettingsModal = ({
                 <ol>
                   <li>
                     Open{' '}
-                    <a 
+                    <a
                       href="https://github.com/baulkobelltimes/baulkobelltimes.github.io/releases"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -326,7 +341,7 @@ const SettingsModal = ({
               </div>
               <div className="extension-note">
                 <p>
-                  <strong>Note:</strong> The extension provides quick access to bell times 
+                  <strong>Note:</strong> The extension provides quick access to bell times
                   directly from your Chrome toolbar.
                 </p>
               </div>
@@ -342,10 +357,10 @@ const SettingsModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="settings-modal">
       <nav className="settings-sidebar">
-        {TABS.map(tab => (
+        {visibleTabs.map(tab => (
           <button
             key={tab.id}
-            className={`settings-nav-btn ${activeTab === tab.id ? 'active' : ''}`}
+            className={`settings-nav-btn ${currentTab === tab.id ? 'active' : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
             <tab.icon size={20} />
@@ -355,7 +370,7 @@ const SettingsModal = ({
       </nav>
       <div className="settings-content">
         <div className="settings-content-inner">
-          {renderTabContent()}
+          {renderTabContent(currentTab)}
         </div>
       </div>
     </Modal>

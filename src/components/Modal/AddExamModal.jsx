@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Plus, BookOpen } from 'lucide-react';
 import Modal from './Modal';
 import Button from '../ui/Button';
@@ -21,12 +21,6 @@ const AddExamModal = ({ isOpen, onClose, onAddExam }) => {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState({});
-
-  useEffect(() => {
-    if (isOpen) {
-      setErrors({});
-    }
-  }, [isOpen]);
 
   const percentage = useMemo(() => {
     const numericScore = parseFloat(score);

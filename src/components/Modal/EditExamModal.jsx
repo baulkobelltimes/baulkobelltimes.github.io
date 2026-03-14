@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Save, Pencil } from 'lucide-react';
 import Modal from './Modal';
 import Button from '../ui/Button';
@@ -12,28 +12,28 @@ const getLetterGrade = (percentage) => {
   return 'E';
 };
 
+const getDefaultDate = () => new Date().toISOString().split('T')[0];
+
 const EditExamModal = ({ isOpen, onClose, exam, onUpdateExam }) => {
-  const [subject, setSubject] = useState('');
-  const [title, setTitle] = useState('');
-  const [score, setScore] = useState('');
-  const [maxScore, setMaxScore] = useState('100');
-  const [weight, setWeight] = useState('100');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [notes, setNotes] = useState('');
+  const [subject, setSubject] = useState(exam?.subject || '');
+  const [title, setTitle] = useState(exam?.title || '');
+  const [score, setScore] = useState(exam?.score ?? '');
+  const [maxScore, setMaxScore] = useState(exam?.maxScore ?? '100');
+  const [weight, setWeight] = useState(exam?.weight ?? '100');
+  const [date, setDate] = useState(exam?.date || getDefaultDate());
+  const [notes, setNotes] = useState(exam?.notes || '');
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    if (exam && isOpen) {
-      setSubject(exam.subject || '');
-      setTitle(exam.title || '');
-      setScore(exam.score ?? '');
-      setMaxScore(exam.maxScore ?? '100');
-      setWeight(exam.weight ?? '100');
-      setDate(exam.date || new Date().toISOString().split('T')[0]);
-      setNotes(exam.notes || '');
-      setErrors({});
-    }
-  }, [exam, isOpen]);
+  const resetFromExam = () => {
+    setSubject(exam?.subject || '');
+    setTitle(exam?.title || '');
+    setScore(exam?.score ?? '');
+    setMaxScore(exam?.maxScore ?? '100');
+    setWeight(exam?.weight ?? '100');
+    setDate(exam?.date || getDefaultDate());
+    setNotes(exam?.notes || '');
+    setErrors({});
+  };
 
   const percentage = useMemo(() => {
     const numericScore = parseFloat(score);
@@ -87,8 +87,13 @@ const EditExamModal = ({ isOpen, onClose, exam, onUpdateExam }) => {
     });
   };
 
+  const handleClose = () => {
+    resetFromExam();
+    onClose();
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="edit-exam-modal">
+    <Modal isOpen={isOpen} onClose={handleClose} className="edit-exam-modal">
       <h3><Pencil size={24} /> Edit Exam</h3>
       <p className="settings-desc">Update your exam details to keep stats accurate.</p>
 
@@ -199,7 +204,7 @@ const EditExamModal = ({ isOpen, onClose, exam, onUpdateExam }) => {
         )}
 
         <div className="form-actions">
-          <Button variant="secondary" type="button" onClick={onClose}>
+          <Button variant="secondary" type="button" onClick={handleClose}>
             Cancel
           </Button>
           <Button variant="primary" type="submit" icon={Save}>

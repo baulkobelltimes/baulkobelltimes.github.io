@@ -5,6 +5,7 @@ const Button = forwardRef(({
   children, 
   variant = 'primary', 
   size = 'md',
+  type = 'button',
   icon: Icon,
   iconPosition = 'left',
   className = '',
@@ -16,6 +17,7 @@ const Button = forwardRef(({
   return (
     <button 
       ref={ref}
+      type={type}
       className={`btn btn-${variant} ${sizeClass} ${iconOnly ? 'btn-icon' : ''} ${className}`}
       {...props}
     >
