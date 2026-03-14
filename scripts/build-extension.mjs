@@ -3,6 +3,7 @@ import { deflateSync } from 'node:zlib';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import yazl from 'yazl';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,13 +11,43 @@ const rootDir = path.resolve(__dirname, '..');
 const distDir = path.join(rootDir, 'dist');
 const extensionOutDir = path.join(rootDir, 'dist-extension');
 const extensionOverlayDir = path.join(rootDir, 'extension');
+const artifactsDir = path.join(rootDir, 'artifacts');
+const packageJsonPath = path.join(rootDir, 'package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+const extensionConfig = packageJson.extension ?? {};
+const shouldZip = process.argv.includes('--zip');
 
 // ─── Configurable values ─────────────────────────────────────────────────────
 const POPUP_WIDTH = 440;          // px – Chrome popup max is 800px
 const POPUP_MIN_HEIGHT = 560;     // px
-const EXTENSION_VERSION = '1.0.0';
+const EXTENSION_NAME = extensionConfig.name ?? 'Baulko Bell Times';
+const EXTENSION_SHORT_NAME = extensionConfig.shortName ?? 'Bell Times';
+const EXTENSION_DESCRIPTION = extensionConfig.description ?? 'Quick access to Baulko Bell Times from your Chrome toolbar.';
+const EXTENSION_ARTIFACT_NAME = extensionConfig.artifactName ?? 'extension';
+const EXTENSION_HOMEPAGE_URL = extensionConfig.homepageUrl ?? packageJson.homepage ?? null;
+const EXTENSION_VERSION = validateExtensionVersion(packageJson.version);
 const ICON_SIZES = [16, 32, 48, 128];
 const ICON_COLOR = [98, 0, 234];  // #6200ea
+
+function validateExtensionVersion(version) {
+  if (!/^\d+(\.\d+){0,3}$/.test(version)) {
+    throw new Error(
+      `package.json version \"${version}\" is not valid for Chrome extensions. Use 1 to 4 numeric segments, for example 1.0.0.`
+    );
+  }
+
+  return version;
+}
+
+function validateManifestMetadata() {
+  if (EXTENSION_NAME.length > 75) {
+    throw new Error(`Extension name must be 75 characters or less. Received ${EXTENSION_NAME.length}.`);
+  }
+
+  if (EXTENSION_DESCRIPTION.length > 132) {
+    throw new Error(`Extension description must be 132 characters or less. Received ${EXTENSION_DESCRIPTION.length}.`);
+  }
+}
 
 // ─── Injected style ──────────────────────────────────────────────────────────
 // Sets the popup dimensions (with !important so they win over any bundled CSS)
@@ -288,15 +319,19 @@ function injectBootstrapModule(html, outputDir) {
 function buildManifest(iconPaths) {
   const manifest = {
     manifest_version: 3,
-    name: 'Baulko Bell Times',
-    short_name: 'Bell Times',
+    name: EXTENSION_NAME,
+    short_name: EXTENSION_SHORT_NAME,
     version: EXTENSION_VERSION,
-    description: 'Quick access to Baulko Bell Times from your Chrome toolbar.',
+    description: EXTENSION_DESCRIPTION,
     action: {
-      default_title: 'Baulko Bell Times',
+      default_title: EXTENSION_NAME,
       default_popup: 'index.html',
     },
   };
+
+  if (EXTENSION_HOMEPAGE_URL) {
+    manifest.homepage_url = EXTENSION_HOMEPAGE_URL;
+  }
 
   if (iconPaths && Object.keys(iconPaths).length > 0) {
     manifest.icons = { ...iconPaths };
@@ -306,9 +341,45 @@ function buildManifest(iconPaths) {
   return manifest;
 }
 
+function addDirectoryToZip(zipFile, sourceDir, currentDir = '') {
+  const entries = fs.readdirSync(path.join(sourceDir, currentDir), { withFileTypes: true });
+
+  for (const entry of entries) {
+    const nextRelativePath = path.join(currentDir, entry.name);
+    const absolutePath = path.join(sourceDir, nextRelativePath);
+
+    if (entry.isDirectory()) {
+      addDirectoryToZip(zipFile, sourceDir, nextRelativePath);
+      continue;
+    }
+
+    zipFile.addFile(absolutePath, nextRelativePath.split(path.sep).join('/'));
+  }
+}
+
+function zipExtensionBundle(sourceDir, destinationZip) {
+  return new Promise((resolve, reject) => {
+    fs.mkdirSync(path.dirname(destinationZip), { recursive: true });
+    fs.rmSync(destinationZip, { force: true });
+
+    const output = fs.createWriteStream(destinationZip);
+    const zipFile = new yazl.ZipFile();
+
+    output.on('close', resolve);
+    output.on('error', reject);
+    zipFile.outputStream.on('error', reject);
+
+    zipFile.outputStream.pipe(output);
+    addDirectoryToZip(zipFile, sourceDir);
+    zipFile.end();
+  });
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-function main() {
+async function main() {
+  validateManifestMetadata();
+
   console.log('Building web app...');
   execSync('npm run build', { cwd: rootDir, stdio: 'inherit' });
 
@@ -347,7 +418,16 @@ function main() {
     `${JSON.stringify(manifest, null, 2)}\n`
   );
 
+  if (shouldZip) {
+    const zipPath = path.join(artifactsDir, `${EXTENSION_ARTIFACT_NAME}-v${EXTENSION_VERSION}.zip`);
+    await zipExtensionBundle(extensionOutDir, zipPath);
+    console.log(`Extension release archive created: ${path.relative(rootDir, zipPath)}`);
+  }
+
   console.log(`Chrome extension build complete: dist-extension/ (v${EXTENSION_VERSION})`);
 }
 
-main();
+main().catch((error) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exitCode = 1;
+});

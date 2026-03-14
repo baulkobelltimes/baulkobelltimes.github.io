@@ -332,10 +332,10 @@ const SettingsModal = ({
                       the releases page
                     </a>
                   </li>
-                  <li>Download the latest release ZIP (the one that says dist.zip)</li>
+                  <li>Download the latest extension ZIP release</li>
                   <li>Unzip it to a new folder</li>
                   <li>Open <code>chrome://extensions</code> and enable Developer mode</li>
-                  <li>Click "Load unpacked" and select the new dist folder</li>
+                  <li>Click "Load unpacked" and select the unzipped extension folder</li>
                   <li>Enjoy your new extension!</li>
                 </ol>
               </div>
