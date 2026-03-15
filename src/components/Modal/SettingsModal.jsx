@@ -324,18 +324,16 @@ const SettingsModal = ({
                   <li>
                     Open{' '}
                     <a
-                      href="https://github.com/baulkobelltimes/baulkobelltimes.github.io/releases"
+                      href="https://chromewebstore.google.com/detail/baulko-bell-times/kgikbmdnimnlcccmjnakodjpgefcgocg"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="extension-link"
                     >
-                      the releases page
+                      the Chrome Web Store page
                     </a>
                   </li>
-                  <li>Download the latest extension ZIP release</li>
-                  <li>Unzip it to a new folder</li>
-                  <li>Open <code>chrome://extensions</code> and enable Developer mode</li>
-                  <li>Click "Load unpacked" and select the unzipped extension folder</li>
+                  <li>Click add to Chrome</li>
+                  <li>Confirm the installation</li>
                   <li>Enjoy your new extension!</li>
                 </ol>
               </div>
