@@ -76,12 +76,16 @@ function AppContent() {
   const [viewStatsOpen, setViewStatsOpen] = useState(false);
   const [notification, setNotification] = useState(null);
 
-  // Update selected day when it's a new school day
+  // Track the last day to detect when the actual calendar day changes
+  const [lastDay, setLastDay] = useState(currentDay);
+
+  // Update selected day only when the actual calendar day changes (not when user manually selects)
   useEffect(() => {
-    if (isSchoolDay && currentDay !== selectedDay) {
+    if (lastDay !== currentDay && isSchoolDay) {
       setSelectedDay(currentDay);
+      setLastDay(currentDay);
     }
-  }, [currentDay, isSchoolDay, selectedDay, setSelectedDay]);
+  }, [currentDay, isSchoolDay, lastDay, setSelectedDay]);
 
   useEffect(() => {
     const validTiles = ['quickLinks', 'quote', 'timer', 'examTracker'];

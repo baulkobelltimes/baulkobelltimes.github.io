@@ -1,7 +1,7 @@
 {
   "name": "bell-times-react",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Baulko Bell Times website and Chrome extension.",
   "type": "module",
   "scripts": {
