@@ -261,15 +261,6 @@ function AppContent() {
           <a href="mailto:hi@shaarav.xyz">
             Made with ♥ by Shaarav4795
           </a>
-          <nav className="footer-nav">
-            <a href="/privacy" onClick={(e) => {
-              e.preventDefault();
-              window.history.pushState({}, '', '/privacy');
-              window.dispatchEvent(new PopStateEvent('popstate'));
-            }}>
-              Privacy Policy
-            </a>
-          </nav>
         </div>
       </footer>
 

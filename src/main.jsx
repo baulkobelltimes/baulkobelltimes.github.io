@@ -5,11 +5,11 @@ import App from './App.jsx'
 
 // GitHub Pages SPA redirect handler
 if (typeof window !== 'undefined') {
-  const redirect = sessionStorage.redirect;
-  if (redirect) {
-    delete sessionStorage.redirect;
-    // Navigate to the stored path
-    window.history.replaceState(null, null, redirect);
+  const params = new URLSearchParams(window.location.search);
+  const path = params.get('_path');
+  if (path) {
+    // Restore the original path and remove the query parameter
+    window.history.replaceState({}, '', '/' + path);
   }
 }
 

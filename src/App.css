@@ -76,12 +76,6 @@
   align-items: center;
 }
 
-.footer-nav {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
 .footer a {
   color: var(--primary-color);
   font-size: 0.875rem;

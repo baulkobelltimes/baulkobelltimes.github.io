@@ -6,15 +6,11 @@
     <title>Baulko Bell Times</title>
     <script>
       // GitHub Pages 404 redirect workaround for SPA routing
-      // Capture the requested path and store it before redirecting to index.html
-      (function(){
-        var path = location.pathname;
-        // Only redirect if it's not already at root and not the 404 page itself
-        if (path !== '/' && !path.includes('/404.html')) {
-          sessionStorage.redirect = path;
-          location.href = '/';
-        }
-      }());
+      // Redirect to index.html with the requested path as a query parameter
+      var path = location.pathname.slice(1);
+      if (path && !path.includes('.')) {
+        location.replace('/?_path=' + path);
+      }
     </script>
   </head>
   <body></body>
