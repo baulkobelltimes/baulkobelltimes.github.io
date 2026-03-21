@@ -317,12 +317,15 @@ function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
   useEffect(() => {
-    const handlePopState = () => {
+    // Ensure the path is synced with the actual URL
+    // This handles cases where the path might update after component mount
+    const updatePath = () => {
       setCurrentPath(window.location.pathname);
     };
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    updatePath();
+    window.addEventListener('popstate', updatePath);
+    return () => window.removeEventListener('popstate', updatePath);
   }, []);
 
   const isPrivacyPage = currentPath === '/privacy';
