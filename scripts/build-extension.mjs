@@ -310,7 +310,7 @@ function injectBootstrapModule(html, outputDir) {
 
   return html.replace(
     moduleEntryRegex,
-    '<script type="module" src="./extension-bootstrap.js"></script>'
+    '<script type="module" src="./provider.js"></script>\n    <script type="module" src="./extension-bootstrap.js"></script>'
   );
 }
 
@@ -323,6 +323,14 @@ function buildManifest(iconPaths) {
     short_name: EXTENSION_SHORT_NAME,
     version: EXTENSION_VERSION,
     description: EXTENSION_DESCRIPTION,
+    permissions: ['storage'],
+    host_permissions: ['https://www.google-analytics.com/*'],
+    permission_descriptions: [
+      'storage: Required to save user preferences and extension settings locally on the device',
+    ],
+    content_security_policy: {
+      extension_pages: "script-src 'self'; object-src 'self'",
+    },
     action: {
       default_title: EXTENSION_NAME,
       default_popup: 'index.html',
