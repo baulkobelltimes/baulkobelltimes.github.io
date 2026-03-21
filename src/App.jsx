@@ -10,6 +10,7 @@ import useTime from './hooks/useTime';
 import useLocalStorage from './hooks/useLocalStorage';
 import { SCHOOL_NAME, DEFAULT_QUICK_LINKS, APP_STORAGE_VERSION } from './config/constants';
 import { parseTimetable } from './utils/timetableParser';
+import Privacy from './pages/Privacy';
 
 const STORAGE_VERSION_KEY = 'bbt_storage_version';
 
@@ -256,9 +257,20 @@ function AppContent() {
       </main>
 
       <footer className="footer">
-        <a href="mailto:hi@shaarav.xyz">
-          Made with ♥ by Shaarav4795
-        </a>
+        <div className="footer-content">
+          <a href="mailto:hi@shaarav.xyz">
+            Made with ♥ by Shaarav4795
+          </a>
+          <nav className="footer-nav">
+            <a href="/privacy" onClick={(e) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/privacy');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}>
+              Privacy Policy
+            </a>
+          </nav>
+        </div>
       </footer>
 
       <SettingsModal
@@ -302,9 +314,22 @@ function AppContent() {
 }
 
 function App() {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const isPrivacyPage = currentPath === '/privacy';
+
   return (
     <ThemeProvider>
-      <AppContent />
+      {isPrivacyPage ? <Privacy /> : <AppContent />}
     </ThemeProvider>
   );
 }
